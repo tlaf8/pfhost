@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, {useState, useEffect} from 'react';
+import { BrowserRouter as Router, Link } from 'react-router-dom';
+import axios from 'axios';
 
-function App() {
-  const [count, setCount] = useState(0)
+const gallery_path = '/gallery';
+const login_path = '/login';
+const upload_path = '/api/upload';
+const static_path = '/api/static';
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+const App = () => {
+    return (
+        <Router>
+            <nav style={{
+                padding: '10px',
+                backgroundColor: '#ddd',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
+                <div style={{
+                    display: 'flex',
+                }}>
+                    <Link to='/gallery' style={{
+                        textDecoration: 'none',
+                        color: 'black',
+                        padding: '5px'
+                    }}>Gallery</Link>
+                    <Link to='/upload' style={{
+                        textDecoration: 'none',
+                        color: 'black',
+                        padding: '5px'
+                    }}>Upload</Link>
+                </div>
+                <div style={{
+                    display: 'flex'
+                }}>
+                    <Link to='/logout' style={{
+                        textDecoration: 'none',
+                        color: 'black',
+                        padding: '5px'
+                    }}>Logout</Link>
+                </div>
+            </nav>
+        </Router>
+    );
 }
 
-export default App
+export default App;
