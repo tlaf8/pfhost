@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 
 class Gallery extends React.Component {

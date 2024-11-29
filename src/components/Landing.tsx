@@ -1,16 +1,30 @@
 import React from 'react';
 
-const Landing: React.FC = () => {
+interface LandingProps {
+    name: string | null;
+}
+
+const Landing: React.FC<LandingProps> = ({name}) => {
     return (
         <div style={{
             marginTop: '70px',
             fontFamily: 'Courier New, monospace',
         }}>
-            <p style={{
-                fontSize: '20px',
-            }}>Welcome! To view current images saved, click on Gallery.</p>
+            {name ? (
+                <p style={{
+                    fontSize: '20px',
+                }}>
+                    Welcome, {name.split(' ')[0]}!
+                </p>
+            ) : (
+                <p style={{
+                    fontSize: '20px',
+                }}>
+                    Welcome! To get started, please log in using Google.
+                </p>
+            )}
         </div>
-    )
+    );
 }
 
 export default Landing;
