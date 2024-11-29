@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import React, {useState, useEffect} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
+import Landing from './components/Landing'
 import axios from 'axios';
 
 const gallery_path = '/gallery';
@@ -51,7 +52,7 @@ const App = () => {
                 </div>
             </nav>
             <Routes>
-                <Route path='/' element={<h1>Hello world!</h1>}/>
+                <Route path='/' element={<Landing/>}/>
                 <Route path={gallery_path} element={<Gallery/>}/>
                 <Route path={upload_path} element={<UploadPage/>}/>
             </Routes>

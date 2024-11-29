@@ -128,7 +128,10 @@ class Gallery extends React.Component {
         ];
 
         return (
-            <div style={{ marginTop: '70px' }}>
+            <div style={{
+                marginTop: '70px' ,
+                fontFamily: 'Courier New, monospace',
+            }}>
                 <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
                     <Masonry gutter='10px'>
                         {mediaItems.map((item, index) => (
