@@ -4,7 +4,7 @@ const UploadPage: React.FC = () => {
     return (
         <div style={{
             marginTop: '70px',
-            fontFamily: 'Courier New, monospace',
+            fontFamily: 'Arial, monospace',
         }}>
             <p>Upload page</p>
         </div>

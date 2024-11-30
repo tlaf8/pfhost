@@ -1,28 +1,16 @@
 import React from 'react';
 
-interface LandingProps {
-    name: string | null;
-}
-
-const Landing: React.FC<LandingProps> = ({name}) => {
+const Landing: React.FC = () => {
     return (
         <div style={{
             marginTop: '70px',
-            fontFamily: 'Courier New, monospace',
+            fontFamily: 'Arial, monospace',
         }}>
-            {name ? (
-                <p style={{
-                    fontSize: '20px',
-                }}>
-                    Welcome, {name.split(' ')[0]}!
-                </p>
-            ) : (
-                <p style={{
-                    fontSize: '20px',
-                }}>
-                    Welcome! To get started, please log in.
-                </p>
-            )}
+            <p style={{
+                fontSize: '20px',
+            }}>
+                Welcome! To get started, please log in.
+            </p>
         </div>
     );
 }

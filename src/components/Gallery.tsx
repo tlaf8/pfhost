@@ -129,18 +129,18 @@ class Gallery extends React.Component {
 
         return (
             <div style={{
-                marginTop: '70px' ,
-                fontFamily: 'Courier New, monospace',
+                marginTop: '70px',
+                fontFamily: 'Arial, monospace',
             }}>
-                <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+                <ResponsiveMasonry columnsCountBreakPoints={{350: 1, 750: 2, 900: 3}}>
                     <Masonry gutter='10px'>
                         {mediaItems.map((item, index) => (
                             <div key={index}>
                                 {item.type === 'image' ? (
-                                    <img src={item.src} alt={`media-${index}`} style={{ width: '100%' }} />
+                                    <img src={item.src} alt={`media-${index}`} style={{width: '100%'}}/>
                                 ) : (
-                                    <video width="100%" controls>
-                                        <source src={item.src} type="video/mp4" />
+                                    <video width='100%' controls>
+                                        <source src={item.src} type='video/mp4'/>
                                     </video>
                                 )}
                             </div>
