@@ -1,18 +1,16 @@
 import React, {useState} from 'react';
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [success, setSuccess] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!username || !password) {
             setError('Username or password is required.');
-            setSuccess('');
             return;
         }
 
@@ -23,23 +21,22 @@ const LoginPage: React.FC = () => {
             });
 
             if (response.status === 200) {
-                setSuccess('successful');
                 setError('');
                 setUsername('');
                 setPassword('');
                 window.location.href = '/';
             }
-        } catch (error: AxiosError) {
-            if (error.response.status === 401) {
-                setSuccess('');
-                setError('Invalid username or password.');
-                setPassword('');
-            } else {
-                setSuccess('');
-                setError(error.response.data?.message || 'An unknown error occurred during login.');
-                setUsername('');
-                setPassword('');
-                console.error('Error:', error);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                if (error?.response?.status === 401) {
+                    setError('Invalid username or password.');
+                    setPassword('');
+                } else {
+                    setError(error?.response?.data?.message || 'An unknown error occurred during login.');
+                    setUsername('');
+                    setPassword('');
+                    console.error('Error:', error);
+                }
             }
         }
     };
@@ -111,7 +108,7 @@ const LoginPage: React.FC = () => {
                     fontSize: '12px',
                     textDecoration: 'none',
                     color: 'blue',
-                }} href='/signup'>No account?</a>
+                }} href='/signup'>No account? Sign up</a>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Link, Route, Routes, useNavigate} from 'react-router-dom';
+import {BrowserRouter as Router, Link, Route, Routes} from 'react-router-dom';
 import React, {useEffect, useState} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
@@ -10,11 +10,9 @@ const gallery_path: string = '/gallery';
 const upload_path: string = '/upload';
 const login_path: string = '/login';
 const signup_path: string = '/signup';
-const backend_hostname: string = 'http://localhost:9999';
 
 const AppContent: React.FC = () => {
     const [user, setUser] = useState<string | null>(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const savedUser = localStorage.getItem('user');
@@ -27,7 +25,7 @@ const AppContent: React.FC = () => {
     const handleLogout = () => {
         setUser(null);
         localStorage.removeItem('user');
-        navigate('/');
+        window.location.href = '/';
     };
 
     return (

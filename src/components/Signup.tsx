@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import axios, {AxiosError} from "axios";
-import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 const SignUpPage: React.FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -8,7 +7,6 @@ const SignUpPage: React.FC = () => {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [success, setSuccess] = useState<string>('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,7 +23,6 @@ const SignUpPage: React.FC = () => {
                     password
                 });
                 if (response.status === 200) {
-                    setSuccess('successful');
                     setError('');
                     setUsername('');
                     setEmail('');
@@ -34,7 +31,6 @@ const SignUpPage: React.FC = () => {
                     alert('Successfully registered!');
                     window.location.href = '/';
                 } else {
-                    setSuccess('');
                     setError('');
                     setUsername('');
                     setEmail('');
@@ -43,10 +39,11 @@ const SignUpPage: React.FC = () => {
                     setError('Signup failed. Check console for details.');
                     console.log(response);
                 }
-            } catch (error: AxiosError) {
-                setError(error.response?.data?.message || 'An error occurred during login.');
-                setSuccess('');
-                console.error('Error:', error);
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    setError(error.response?.data?.message || 'An error occurred during login.');
+                    console.error('Error:', error);
+                }
             }
             setError('');
         }
