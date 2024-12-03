@@ -24,28 +24,30 @@ const SignUpPage: React.FC = () => {
                 });
                 if (response.status === 200) {
                     setError('');
-                    setUsername('');
-                    setEmail('');
-                    setPassword('');
-                    setConfirmPassword('');
                     alert('Successfully registered!');
-                    window.location.href = '/';
+                    window.location.href = '/login';
                 } else {
-                    setError('');
-                    setUsername('');
-                    setEmail('');
-                    setPassword('');
-                    setConfirmPassword('');
                     setError('Signup failed. Check console for details.');
                     console.log(response);
                 }
             } catch (error: unknown) {
                 if (axios.isAxiosError(error)) {
-                    setError(error.response?.data?.message || 'An error occurred during login.');
-                    console.error('Error:', error);
+                    if (error?.response?.status === 401) {
+                        alert("Invalid username or password.");
+                        setPassword('');
+                    } else {
+                        alert(error?.response?.data?.message || "Something went wrong when signing up. Check console for details.");
+                        setUsername('');
+                        setPassword('');
+                        console.error('Error:', error);
+                    }
                 }
             }
             setError('');
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
         }
     };
 

@@ -17,98 +17,115 @@ const LoginPage: React.FC = () => {
         try {
             const response = await axios.post('http://localhost:9999/api/login', {
                 username,
-                password
+                password,
             });
 
             if (response.status === 200) {
+                const {token} = response.data;
+                sessionStorage.setItem('authToken', token);
                 setError('');
                 setUsername('');
                 setPassword('');
-                window.location.href = '/';
+                window.location.href = '/dashboard';
             }
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                if (error?.response?.status === 401) {
+                if (error.response?.status === 401) {
                     setError('Invalid username or password.');
                     setPassword('');
                 } else {
-                    setError(error?.response?.data?.message || 'An unknown error occurred during login.');
-                    setUsername('');
-                    setPassword('');
+                    setError('An error occurred. Please try again later.');
                     console.error('Error:', error);
                 }
+            } else {
+                console.error('Unknown error:', error);
+                setError('An unexpected error occurred.');
             }
         }
     };
 
     return (
-        <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '70px',
-            fontFamily: 'Arial, monospace',
-        }}>
-            <div style={{
-                width: '25em',
-            }}>
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '70px',
+                fontFamily: 'Arial, monospace',
+            }}
+        >
+            <div style={{width: '25em'}}>
                 <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
-                    <div style={{
-                        marginBottom: '10px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}>
-                        <label htmlFor='username'>Username</label>
+                    <div
+                        style={{
+                            marginBottom: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        <label htmlFor="username">Username</label>
                         <input
-                            type='text'
-                            id='username'
+                            type="text"
+                            id="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             style={{
                                 width: 'auto',
                                 padding: '8px',
-                                marginTop: '4px'
-                            }}/>
+                                marginTop: '4px',
+                            }}
+                        />
                     </div>
 
-                    <div style={{
-                        marginBottom: '10px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}>
-                        <label htmlFor='password'>Password</label>
+                    <div
+                        style={{
+                            marginBottom: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        <label htmlFor="password">Password</label>
                         <input
-                            type='password'
-                            id='password'
+                            type="password"
+                            id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             style={{
                                 width: 'auto',
                                 padding: '8px',
-                                marginTop: '4px'
-                            }}/>
+                                marginTop: '4px',
+                            }}
+                        />
                     </div>
 
                     {error && <p style={{color: 'red', fontSize: '14px'}}>{error}</p>}
 
-                    <button type='submit' style={{
-                        width: '25%',
-                        padding: '10px',
-                        margin: '10px 0',
-                        backgroundColor: '#007bff',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px'
-                    }}>
+                    <button
+                        type="submit"
+                        style={{
+                            width: '25%',
+                            padding: '10px',
+                            margin: '10px 0',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                        }}
+                    >
                         Login
                     </button>
                 </form>
-                <a style={{
-                    fontSize: '12px',
-                    textDecoration: 'none',
-                    color: 'blue',
-                }} href='/signup'>No account? Sign up</a>
+                <a
+                    style={{
+                        fontSize: '12px',
+                        textDecoration: 'none',
+                        color: 'blue',
+                    }}
+                    href="/signup"
+                >
+                    No account? Sign up
+                </a>
             </div>
         </div>
     );
