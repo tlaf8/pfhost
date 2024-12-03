@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 const SignUpPage: React.FC = () => {
+    const navigate = useNavigate();
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -25,7 +27,7 @@ const SignUpPage: React.FC = () => {
                 if (response.status === 200) {
                     setError('');
                     alert('Successfully registered!');
-                    window.location.href = '/login';
+                    navigate('/login');
                 } else {
                     setError('Signup failed. Check console for details.');
                     console.log(response);

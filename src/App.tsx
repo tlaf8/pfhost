@@ -15,22 +15,25 @@ const signup_path: string = '/signup';
 const dashboard_path: string = '/dashboard';
 
 const AppContent: React.FC = () => {
-    const [user, setUser] = useState<number>(-1);
+    const [userId, setUserId] = useState<number | null>(-1);
+    const [username, setUsername] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const validateSession = useCallback(async (token: string | null) => {
         if (!token) {
-            return -1;
+            setUserId(-1);
+            setUsername(null);
         }
 
         try {
-            const response = await axios.get('http://localhost:9999/api/protected', {
+            const response = await axios.get('http://localhost:9999/api/validate', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            return response.data.userId;
+            setUserId(response.data.userId);
+            setUsername(response.data.username);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
@@ -48,7 +51,8 @@ const AppContent: React.FC = () => {
 
     const handleLogout = () => {
         sessionStorage.removeItem('authToken');
-        setUser(-1);
+        setUserId(-1);
+        setUsername(null);
         navigate('/');
     };
 
@@ -57,8 +61,7 @@ const AppContent: React.FC = () => {
             const token = sessionStorage.getItem('authToken');
             if (token) {
                 try {
-                    setUser(await validateSession(token));
-                    return;
+                    await validateSession(token);
                 } catch (error) {
                     if (isAxiosError(error)) {
                         if (error.response?.status === 401) {
@@ -66,12 +69,14 @@ const AppContent: React.FC = () => {
                         }
                     }
                     sessionStorage.removeItem('authToken');
-                    setUser(-1);
+                    setUserId(-1);
+                    setUsername(null);
                     navigate('/');
                 }
             } else {
                 sessionStorage.removeItem('authToken');
-                setUser(-1);
+                setUserId(-1);
+                setUsername(null);
             }
         };
 
@@ -121,8 +126,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: (user !== -1) ? 'auto' : 'none',
-                            color: (user !== -1) ? 'black' : 'gray',
+                            pointerEvents: (userId !== -1) ? 'auto' : 'none',
+                            color: (userId !== -1) ? 'black' : 'gray',
                         }}
                     >
                         Gallery
@@ -132,8 +137,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: (user !== -1) ? 'auto' : 'none',
-                            color: (user !== -1) ? 'black' : 'gray',
+                            pointerEvents: (userId !== -1) ? 'auto' : 'none',
+                            color: (userId !== -1) ? 'black' : 'gray',
                         }}
                     >
                         Upload
@@ -145,7 +150,7 @@ const AppContent: React.FC = () => {
                         marginRight: '10px',
                     }}
                 >
-                    {user !== -1 ? (
+                    {userId !== -1 ? (
                         <Link
                             to='/'
                             style={{
@@ -179,7 +184,7 @@ const AppContent: React.FC = () => {
                 <Route path={upload_path} element={<UploadPage/>}/>
                 <Route path={login_path} element={<Login/>}/>
                 <Route path={signup_path} element={<Signup/>}/>
-                <Route path={dashboard_path} element={<Dashboard/>}/>
+                <Route path={dashboard_path} element={<Dashboard authUserId={userId} authUsername={username}/>}/>
             </Routes>
         </>
     );

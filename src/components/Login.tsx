@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
 const LoginPage: React.FC = () => {
+    const navigate = useNavigate();
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
@@ -26,7 +28,7 @@ const LoginPage: React.FC = () => {
                 setError('');
                 setUsername('');
                 setPassword('');
-                window.location.href = '/dashboard';
+                navigate('/dashboard');
             }
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
