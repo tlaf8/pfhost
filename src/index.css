@@ -1,0 +1,11 @@
+.masonry-grid {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-left: -10px;
+    width: auto;
+}
+.masonry-grid-col {
+    padding-left: 10px;
+    background-clip: padding-box;
+}

@@ -1,155 +1,47 @@
-import React from 'react';
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import React, { useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import MasonryCSS from 'react-masonry-css';
 
-class Gallery extends React.Component {
-    render() {
-        // Temporary, get files from backend server
-        const mediaItems = [
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/2280547/pexels-photo-2280547.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/276267/pexels-photo-276267.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-            { type: 'image', src: 'https://data.textstudio.com/output/sample/animated/4/6/0/6/sample-1-16064.gif' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/4124024/4124024-uhd_2732_1440_25fps.mp4' },
-            { type: 'video', src: 'https://videos.pexels.com/video-files/3195394/3195394-sd_640_360_25fps.mp4' },
-            { type: 'image', src: 'https://images.pexels.com/photos/159045/the-interior-of-the-repair-interior-design-159045.jpeg?auto=compress&cs=tinysrgb&w=400' },
-        ];
+const Gallery: React.FC = () => {
+    const navigate = useNavigate();
 
-        return (
-            <div style={{
-                marginTop: '70px',
-                fontFamily: 'Arial, monospace',
-            }}>
-                <ResponsiveMasonry columnsCountBreakPoints={{350: 1, 750: 2, 900: 3}}>
-                    <Masonry gutter='10px'>
-                        {mediaItems.map((item, index) => (
-                            <div key={index}>
-                                {item.type === 'image' ? (
-                                    <img src={item.src} alt={`media-${index}`} style={{width: '100%'}}/>
-                                ) : (
-                                    <video width='100%' controls>
-                                        <source src={item.src} type='video/mp4'/>
-                                    </video>
-                                )}
-                            </div>
-                        ))}
-                    </Masonry>
-                </ResponsiveMasonry>
-            </div>
-        );
-    }
+    useEffect(() => {
+        const token = sessionStorage.getItem('authToken');
+
+        if (!token) {
+            navigate('/');
+        }
+    }, [navigate]);
+
+    const breakpointColumnsObj = {
+        default: 5,
+        900: 4,
+        700: 3,
+        500: 2,
+        300: 2
+    };
+
+    const items = Array.from({length: 100}).map((_, index) => (
+        <img
+            key={index}
+            src={`https://picsum.photos/200/${Math.floor(
+                Math.random() * (300 - 200 + 1) + 200
+            )}`}
+            style={{width: "100%", marginBottom: "5px"}}
+         alt={`pic_${index}`}/>
+    ));
+
+    return (
+        <div style={{marginTop: '70px'}}>
+            <MasonryCSS
+                breakpointCols={breakpointColumnsObj}
+                className="masonry-grid"
+                columnClassName="masonry-grid-col"
+            >
+                {items}
+            </MasonryCSS>
+        </div>
+    );
 }
 
 export default Gallery;

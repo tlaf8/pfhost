@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
-    const [error, setError] = useState<string | null>(null);
+    const [error] = useState<string | null>(null);
 
     useEffect(() => {
         const token = sessionStorage.getItem('authToken');

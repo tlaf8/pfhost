@@ -1,11 +1,12 @@
-import { BrowserRouter as Router, Link, Route, Routes, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import {BrowserRouter as Router, Link, Route, Routes, useNavigate} from 'react-router-dom';
+import React, {useCallback, useEffect, useState} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
+import axios, {isAxiosError} from "axios";
 
 const gallery_path: string = '/gallery';
 const upload_path: string = '/upload';
@@ -14,35 +15,74 @@ const signup_path: string = '/signup';
 const dashboard_path: string = '/dashboard';
 
 const AppContent: React.FC = () => {
-    const [user, setUser] = useState<boolean>(false);
+    const [user, setUser] = useState<number>(-1);
     const navigate = useNavigate();
 
-    const validateSessionLocal = (token: string): boolean => {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const currentTime = Math.floor(Date.now() / 1000);
-            return payload.exp > currentTime;
-        } catch (e) {
-            console.error('Error decoding token:', e);
-            return false;
+    const validateSession = useCallback(async (token: string | null) => {
+        if (!token) {
+            return -1;
         }
-    };
+
+        try {
+            const response = await axios.get('http://localhost:9999/api/protected', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            return response.data.userId;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 401) {
+                    alert('Session is invalid or expired. Please log in again.');
+                } else {
+                    alert('An unknown error occurred while validating session. Please log in again.');
+                }
+            } else {
+                alert('An unknown error occurred. Please log in again.');
+            }
+            sessionStorage.removeItem('authToken');
+            navigate('/login');
+        }
+    }, [navigate]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('authToken');
-        setUser(false);
+        setUser(-1);
         navigate('/');
     };
 
     useEffect(() => {
-        const token = sessionStorage.getItem('authToken');
-        if (token) {
-            const isValid = validateSessionLocal(token);
-            setUser(isValid);
-        } else {
-            setUser(false);
-        }
-    }, [navigate]);
+        const checkAuthentication = async () => {
+            const token = sessionStorage.getItem('authToken');
+            if (token) {
+                try {
+                    setUser(await validateSession(token));
+                    return;
+                } catch (error) {
+                    if (isAxiosError(error)) {
+                        if (error.response?.status === 401) {
+                            alert('Session expired. Please log in again.');
+                        }
+                    }
+                    sessionStorage.removeItem('authToken');
+                    setUser(-1);
+                    navigate('/');
+                }
+            } else {
+                sessionStorage.removeItem('authToken');
+                setUser(-1);
+            }
+        };
+
+        checkAuthentication().catch((error) => {
+            if (isAxiosError(error)) {
+                if (!(error.response?.status === 401)) {
+                    console.error("Unknown error occurred:", error);
+                }
+            }
+        });
+    }, [navigate, validateSession]);
 
     return (
         <>
@@ -67,7 +107,7 @@ const AppContent: React.FC = () => {
                     }}
                 >
                     <Link
-                        to="/dashboard"
+                        to='/dashboard'
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
@@ -81,8 +121,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: user ? 'auto' : 'none',
-                            color: user ? 'black' : 'gray',
+                            pointerEvents: (user !== -1) ? 'auto' : 'none',
+                            color: (user !== -1) ? 'black' : 'gray',
                         }}
                     >
                         Gallery
@@ -92,8 +132,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: user ? 'auto' : 'none',
-                            color: user ? 'black' : 'gray',
+                            pointerEvents: (user !== -1) ? 'auto' : 'none',
+                            color: (user !== -1) ? 'black' : 'gray',
                         }}
                     >
                         Upload
@@ -105,9 +145,9 @@ const AppContent: React.FC = () => {
                         marginRight: '10px',
                     }}
                 >
-                    {user ? (
+                    {user !== -1 ? (
                         <Link
-                            to="/"
+                            to='/'
                             style={{
                                 textDecoration: 'none',
                                 color: 'black',
@@ -134,12 +174,12 @@ const AppContent: React.FC = () => {
                 </div>
             </nav>
             <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path={gallery_path} element={<Gallery />} />
-                <Route path={upload_path} element={<UploadPage />} />
-                <Route path={login_path} element={<Login />} />
-                <Route path={signup_path} element={<Signup />} />
-                <Route path={dashboard_path} element={<Dashboard />} />
+                <Route path='/' element={<Landing/>}/>
+                <Route path={gallery_path} element={<Gallery/>}/>
+                <Route path={upload_path} element={<UploadPage/>}/>
+                <Route path={login_path} element={<Login/>}/>
+                <Route path={signup_path} element={<Signup/>}/>
+                <Route path={dashboard_path} element={<Dashboard/>}/>
             </Routes>
         </>
     );
@@ -148,7 +188,7 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <Router>
-            <AppContent />
+            <AppContent/>
         </Router>
     );
 };
