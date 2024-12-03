@@ -187,7 +187,7 @@ const AppContent: React.FC = () => {
             <Routes>
                 <Route path='/' element={<Landing/>}/>
                 <Route path={gallery_path} element={<Gallery userDir={userDir}/>}/>
-                <Route path={upload_path} element={<UploadPage/>}/>
+                <Route path={upload_path} element={<UploadPage useDirectory={userDir}/>}/>
                 <Route path={login_path} element={<Login/>}/>
                 <Route path={signup_path} element={<Signup/>}/>
                 <Route path={dashboard_path} element={<Dashboard authUserId={userId} authUsername={username}/>}/>
