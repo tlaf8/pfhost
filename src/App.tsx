@@ -17,18 +17,7 @@ const AppContent: React.FC = () => {
     const [user, setUser] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('authToken');
-        if (token) {
-            const isValid = validateToken(token);
-            setUser(isValid);
-            navigate('/dashboard');
-        } else {
-            setUser(false);
-        }
-    }, []);
-
-    const validateToken = (token: string): boolean => {
+    const validateSessionLocal = (token: string): boolean => {
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
             const currentTime = Math.floor(Date.now() / 1000);
@@ -44,6 +33,16 @@ const AppContent: React.FC = () => {
         setUser(false);
         navigate('/');
     };
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('authToken');
+        if (token) {
+            const isValid = validateSessionLocal(token);
+            setUser(isValid);
+        } else {
+            setUser(false);
+        }
+    }, [navigate]);
 
     return (
         <>
