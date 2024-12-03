@@ -17,12 +17,14 @@ const dashboard_path: string = '/dashboard';
 const AppContent: React.FC = () => {
     const [userId, setUserId] = useState<number | null>(-1);
     const [username, setUsername] = useState<string | null>(null);
+    const [userDir, setUserDir] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const validateSession = useCallback(async (token: string | null) => {
         if (!token) {
             setUserId(-1);
             setUsername(null);
+            setUserDir(null);
         }
 
         try {
@@ -34,6 +36,7 @@ const AppContent: React.FC = () => {
 
             setUserId(response.data.userId);
             setUsername(response.data.username);
+            setUserDir(response.data.userDir);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
@@ -53,6 +56,7 @@ const AppContent: React.FC = () => {
         sessionStorage.removeItem('authToken');
         setUserId(-1);
         setUsername(null);
+        setUserDir(null);
         navigate('/');
     };
 
@@ -71,12 +75,14 @@ const AppContent: React.FC = () => {
                     sessionStorage.removeItem('authToken');
                     setUserId(-1);
                     setUsername(null);
+                    setUserDir(null);
                     navigate('/');
                 }
             } else {
                 sessionStorage.removeItem('authToken');
                 setUserId(-1);
                 setUsername(null);
+                setUserDir(null);
             }
         };
 
@@ -180,7 +186,7 @@ const AppContent: React.FC = () => {
             </nav>
             <Routes>
                 <Route path='/' element={<Landing/>}/>
-                <Route path={gallery_path} element={<Gallery/>}/>
+                <Route path={gallery_path} element={<Gallery userDir={userDir}/>}/>
                 <Route path={upload_path} element={<UploadPage/>}/>
                 <Route path={login_path} element={<Login/>}/>
                 <Route path={signup_path} element={<Signup/>}/>

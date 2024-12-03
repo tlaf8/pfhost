@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 interface DashboardProps {
@@ -6,7 +6,7 @@ interface DashboardProps {
     authUsername: string | null
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ authUserId, authUsername }) => {
+const Dashboard: React.FC<DashboardProps> = ({authUserId, authUsername}) => {
     const navigate = useNavigate();
     const [error] = useState<string | null>(null);
 
@@ -29,7 +29,7 @@ const Dashboard: React.FC<DashboardProps> = ({ authUserId, authUsername }) => {
                 Welcome back, {authUsername} ({authUserId}).
             </p>
 
-            {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
+            {error && <p style={{color: 'red', fontSize: '14px'}}>{error}</p>}
         </div>
     );
 };

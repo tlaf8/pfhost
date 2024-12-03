@@ -1,17 +1,66 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigate} from "react-router-dom";
 import MasonryCSS from 'react-masonry-css';
+import axios from 'axios';
 
-const Gallery: React.FC = () => {
+interface GalleryProps {
+    userDir: string | null;
+}
+
+const Gallery: React.FC<GalleryProps> = ({userDir}) => {
+    const [images, setImages] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const fetchImages = useCallback(async () => {
         const token = sessionStorage.getItem('authToken');
 
-        if (!token) {
+        if (!token || !userDir) {
             navigate('/');
+            return;
         }
-    }, [navigate]);
+
+        try {
+            const fileListResponse = await axios.get(`http://localhost:9999/api/protected/${userDir}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const fileList = fileListResponse.data.files;
+            const imagePromises = fileList.map((filename: string) =>
+                axios.get(`http://localhost:9999/api/protected/${userDir}/${filename}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => URL.createObjectURL(new Blob([response.data])))
+            );
+
+            const imageUrls = await Promise.all(imagePromises);
+            setImages(imageUrls);
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userDir, navigate]);
+
+    useEffect(() => {
+        fetchImages().catch((error) => {
+            console.error('Error fetching images:', error);
+        });
+
+        return () => {
+            images.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [fetchImages, images]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     const breakpointColumnsObj = {
         default: 5,
@@ -21,16 +70,6 @@ const Gallery: React.FC = () => {
         300: 2
     };
 
-    const items = Array.from({length: 100}).map((_, index) => (
-        <img
-            key={index}
-            src={`https://picsum.photos/200/${Math.floor(
-                Math.random() * (300 - 200 + 1) + 200
-            )}`}
-            style={{width: "100%", marginBottom: "5px"}}
-         alt={`pic_${index}`}/>
-    ));
-
     return (
         <div style={{marginTop: '70px'}}>
             <MasonryCSS
@@ -38,10 +77,17 @@ const Gallery: React.FC = () => {
                 className="masonry-grid"
                 columnClassName="masonry-grid-col"
             >
-                {items}
+                {images.map((src, index) => (
+                    <img
+                        key={index}
+                        src={src}
+                        style={{width: "100%", marginBottom: "5px"}}
+                        alt={`Image ${index + 1}`}
+                    />
+                ))}
             </MasonryCSS>
         </div>
     );
-}
+};
 
 export default Gallery;
