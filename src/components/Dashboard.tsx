@@ -6,7 +6,7 @@ interface DashboardProps {
     authUsername: string | null
 }
 
-const Dashboard: React.FC<DashboardProps> = ({authUserId, authUsername}) => {
+const Dashboard: React.FC<DashboardProps> = ({authUsername}) => {
     const navigate = useNavigate();
     const [error] = useState<string | null>(null);
 
