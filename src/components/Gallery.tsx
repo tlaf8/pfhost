@@ -6,6 +6,7 @@ import axios from 'axios';
 interface MediaFile {
     url: string;
     type: 'image' | 'video' | 'audio' | 'unknown';
+    filename: string;
 }
 
 interface GalleryProps {
@@ -17,10 +18,17 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    const getFileType = (mimeType: string): MediaFile['type'] => {
-        if (mimeType.startsWith('image/')) return 'image';
-        if (mimeType.startsWith('video/')) return 'video';
-        if (mimeType.startsWith('audio/')) return 'audio';
+    const getFileType = (filename: string): MediaFile['type'] => {
+        const extension = filename.split('.').pop()?.toLowerCase() || '';
+
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+        const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
+        const audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'];
+
+        if (imageExtensions.includes(extension)) return 'image';
+        if (videoExtensions.includes(extension)) return 'video';
+        if (audioExtensions.includes(extension)) return 'audio';
+
         return 'unknown';
     };
 
@@ -40,28 +48,12 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
             });
 
             const fileList = fileListResponse.data.files;
-            const mediaPromises = fileList.map(async (filename: string) => {
-                const response = await axios.get(`${import.meta.env.VITE_HOST}/api/protected/${userDir}/${filename}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+            const mediaFiles: MediaFile[] = fileList.map((filename: string) => ({
+                url: `${import.meta.env.VITE_HOST}/cdn/${userDir}/src/${filename}?token=${token}`,
+                type: getFileType(filename),
+                filename
+            }));
 
-                const byteCharacters = atob(response.data.fileContents);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], {type: response.data.fileType});
-
-                const url = URL.createObjectURL(blob);
-                const type = getFileType(response.data.fileType);
-
-                return {url, type};
-            });
-
-            const mediaFiles = await Promise.all(mediaPromises);
             setMedia(mediaFiles);
         } catch (error) {
             console.error('Error fetching media:', error);
@@ -71,16 +63,10 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
     }, [userDir, navigate]);
 
     useEffect(() => {
-        if (media.length === 0) {
-            fetchMedia().catch((error) => {
-                console.error('Error fetching media:', error);
-            });
-
-            return () => {
-                media.forEach((file) => URL.revokeObjectURL(file.url));
-            };
-        }
-    }, [fetchMedia, media]);
+        fetchMedia().catch((error) => {
+            console.error(error);
+        });
+    }, [fetchMedia]);
 
     const renderMediaContent = (file: MediaFile) => {
         const mediaStyles = {
@@ -95,7 +81,7 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
                     <img
                         src={file.url}
                         style={mediaStyles}
-                        alt="Media item"
+                        alt={file.filename}
                     />
                 );
 
@@ -158,9 +144,6 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
                         className="media-container"
                         style={{
                             padding: "5px",
-                            // border: "1px solid #ddd",
-                            // borderRadius: "8px",
-                            // backgroundColor: "#f9f9f9",
                         }}
                     >
                         {renderMediaContent(file)}
