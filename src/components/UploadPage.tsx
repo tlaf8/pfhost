@@ -6,7 +6,7 @@ interface UploadProps {
     useDirectory: string | null;
 }
 
-const UploadPage: React.FC<UploadProps> = ({ useDirectory }) => {
+const UploadPage: React.FC<UploadProps> = ({useDirectory}) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -55,7 +55,7 @@ const UploadPage: React.FC<UploadProps> = ({ useDirectory }) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`http://localhost:9999/api/protected/upload/${useDirectory}`, formData, {
+                await axios.post(`${import.meta.env.VITE_HOST}/api/protected/upload/${useDirectory}`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,

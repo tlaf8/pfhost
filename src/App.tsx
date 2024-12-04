@@ -28,7 +28,7 @@ const AppContent: React.FC = () => {
         }
 
         try {
-            const response = await axios.get('http://localhost:9999/api/validate', {
+            const response = await axios.get(`${import.meta.env.VITE_HOST}/api/validate`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

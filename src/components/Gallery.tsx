@@ -33,7 +33,7 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
         }
 
         try {
-            const fileListResponse = await axios.get(`http://localhost:9999/api/protected/${userDir}`, {
+            const fileListResponse = await axios.get(`${import.meta.env.VITE_HOST}/api/protected/${userDir}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -41,25 +41,24 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
 
             const fileList = fileListResponse.data.files;
             const mediaPromises = fileList.map(async (filename: string) => {
-                const response = await axios.get(`http://localhost:9999/api/protected/${userDir}/${filename}`, {
+                const response = await axios.get(`${import.meta.env.VITE_HOST}/api/protected/${userDir}/${filename}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
 
-                // Decode base64 to blob
                 const byteCharacters = atob(response.data.fileContents);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
                     byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
                 const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: response.data.fileType });
+                const blob = new Blob([byteArray], {type: response.data.fileType});
 
                 const url = URL.createObjectURL(blob);
                 const type = getFileType(response.data.fileType);
 
-                return { url, type };
+                return {url, type};
             });
 
             const mediaFiles = await Promise.all(mediaPromises);
@@ -83,7 +82,6 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
         }
     }, [fetchMedia, media]);
 
-    // Render different media types
     const renderMediaContent = (file: MediaFile) => {
         const mediaStyles = {
             width: "100%",

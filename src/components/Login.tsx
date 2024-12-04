@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:9999/api/login', {
+            const response = await axios.post(`${import.meta.env.VITE_HOST}/api/login`, {
                 username,
                 password,
             });
