@@ -20,7 +20,7 @@ const Landing: React.FC = () => {
             <p style={{
                 fontSize: '20px',
             }}>
-                Welcome! To get started, please log in.
+                Please log in.
             </p>
         </div>
     );

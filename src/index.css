@@ -5,7 +5,12 @@
     margin-left: -10px;
     width: auto;
 }
+
 .masonry-grid-col {
     padding-left: 10px;
     background-clip: padding-box;
+}
+
+div {
+    font-family: Arial, Helvetica, sans-serif;
 }
