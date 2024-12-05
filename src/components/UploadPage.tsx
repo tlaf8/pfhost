@@ -55,7 +55,7 @@ const UploadPage: React.FC<UploadProps> = ({useDirectory}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`${import.meta.env.VITE_HOST}/api/protected/upload/${useDirectory}`, formData, {
+                await axios.post(`${import.meta.env.VITE_HOST}/api/upload/${useDirectory}`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -87,6 +87,7 @@ const UploadPage: React.FC<UploadProps> = ({useDirectory}) => {
                 setUploadProgress(0);
             }
         } else if (linkInput) {
+            alert("Link upload is not supported yet.");
             // const result = await axios.get(`${hostname}${yoink_path}?url=${encodeURI(linkInput)}`);
             // if (result.status === 200) {
             //     alert('File downloaded successfully');

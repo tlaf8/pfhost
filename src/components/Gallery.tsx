@@ -41,7 +41,7 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
         }
 
         try {
-            const fileListResponse = await axios.get(`${import.meta.env.VITE_HOST}/api/protected/${userDir}`, {
+            const fileListResponse = await axios.get(`${import.meta.env.VITE_HOST}/api/${userDir}?dir=compressed`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -49,7 +49,7 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
 
             const fileList = fileListResponse.data.files;
             const mediaFiles: MediaFile[] = fileList.map((filename: string) => ({
-                url: `${import.meta.env.VITE_HOST}/cdn/${userDir}/src/${filename}?token=${token}`,
+                url: `${import.meta.env.VITE_HOST}/cdn/${userDir}/compressed/${filename}?token=${token}`,
                 type: getFileType(filename),
                 filename
             }));
@@ -138,17 +138,38 @@ const Gallery: React.FC<GalleryProps> = ({userDir}) => {
                 className="masonry-grid"
                 columnClassName="masonry-grid-col"
             >
-                {media.map((file, index) => (
-                    <div
-                        key={index}
-                        className="media-container"
-                        style={{
-                            padding: "5px",
-                        }}
-                    >
-                        {renderMediaContent(file)}
-                    </div>
-                ))}
+                {media.map((file, index) => {
+                    const token = sessionStorage.getItem('authToken');
+
+                    if (!token || !userDir) {
+                        navigate('/');
+                        return;
+                    }
+
+                    return (
+                        <div
+                            key={index}
+                            className="media-container"
+                            style={{
+                                padding: "5px",
+                            }}
+                        >
+                            {renderMediaContent(file)}
+                            <a
+                                href={`${import.meta.env.VITE_HOST}/cdn/${userDir}/src/${file.filename.replace('compressed_', '')}?token=${token}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: "block",
+                                    marginTop: "10px",
+                                    textDecoration: "none",
+                                    color: "blue",
+                                }}
+                            >{file.filename.replace('compressed_', '') || 'file'}
+                            </a>
+                        </div>
+                    )
+                })}
             </MasonryCSS>
         </div>
     );
