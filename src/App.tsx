@@ -23,6 +23,7 @@ const AppContent: React.FC = () => {
     const validateSession = useCallback(async () => {
         try {
             const token = sessionStorage.getItem('authToken');
+            if (!token) return;
             const response = await axios.get(`${import.meta.env.VITE_HOST}/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
