@@ -15,85 +15,54 @@ const signup_path: string = '/signup';
 const dashboard_path: string = '/dashboard';
 
 const AppContent: React.FC = () => {
-    const [userId, setUserId] = useState<number | null>(-1);
+    const [userId, setUserId] = useState<number | null>(null);
     const [username, setUsername] = useState<string | null>(null);
     const [userDir, setUserDir] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    const validateSession = useCallback(async (token: string | null) => {
-        if (!token) {
-            setUserId(-1);
-            setUsername(null);
-            setUserDir(null);
-        }
-
+    const validateSession = useCallback(async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_HOST}/api/validate`, {
+            const token = sessionStorage.getItem('authToken');
+            const response = await axios.get(`${import.meta.env.VITE_HOST}/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            setUserId(response.data.userId);
+            setUserId(response.data.id);
             setUsername(response.data.username);
-            setUserDir(response.data.userDir);
+            setUserDir(response.data.path);
         } catch (error) {
-            if (axios.isAxiosError(error)) {
+            if (isAxiosError(error)) {
                 if (error.response?.status === 401) {
-                    alert('Session is invalid or expired. Please log in again.');
+                    console.error('Session is invalid or expired. Please log in again.');
                 } else {
-                    alert('An unknown error occurred while validating session. Please log in again.');
+                    console.error('An unknown error occurred while validating session. Please log in again.');
                 }
             } else {
-                alert('An unknown error occurred. Please log in again.');
+                console.error('An unknown error occurred. Please log in again.');
             }
             sessionStorage.removeItem('authToken');
+            setUserId(null);
+            setUsername(null);
+            setUserDir(null);
             navigate('/login');
         }
     }, [navigate]);
 
+    useEffect(() => {
+        validateSession().catch((error) => {
+            console.error(error);
+        })
+    }, [navigate, validateSession])
+
     const handleLogout = () => {
         sessionStorage.removeItem('authToken');
-        setUserId(-1);
+        setUserId(null);
         setUsername(null);
         setUserDir(null);
         navigate('/');
     };
-
-    useEffect(() => {
-        const checkAuthentication = async () => {
-            const token = sessionStorage.getItem('authToken');
-            if (token) {
-                try {
-                    await validateSession(token);
-                } catch (error) {
-                    if (isAxiosError(error)) {
-                        if (error.response?.status === 401) {
-                            alert('Session expired. Please log in again.');
-                        }
-                    }
-                    sessionStorage.removeItem('authToken');
-                    setUserId(-1);
-                    setUsername(null);
-                    setUserDir(null);
-                    navigate('/');
-                }
-            } else {
-                sessionStorage.removeItem('authToken');
-                setUserId(-1);
-                setUsername(null);
-                setUserDir(null);
-            }
-        };
-
-        checkAuthentication().catch((error) => {
-            if (isAxiosError(error)) {
-                if (!(error.response?.status === 401)) {
-                    console.error("Unknown error occurred:", error);
-                }
-            }
-        });
-    }, [navigate, validateSession]);
 
     return (
         <>
@@ -132,8 +101,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: (userId !== -1) ? 'auto' : 'none',
-                            color: (userId !== -1) ? 'black' : 'gray',
+                            pointerEvents: (userId !== null) ? 'auto' : 'none',
+                            color: (userId !== null) ? 'black' : 'gray',
                         }}
                     >
                         Gallery
@@ -143,8 +112,8 @@ const AppContent: React.FC = () => {
                         style={{
                             textDecoration: 'none',
                             padding: '10px',
-                            pointerEvents: (userId !== -1) ? 'auto' : 'none',
-                            color: (userId !== -1) ? 'black' : 'gray',
+                            pointerEvents: (userId !== null) ? 'auto' : 'none',
+                            color: (userId !== null) ? 'black' : 'gray',
                         }}
                     >
                         Upload
@@ -156,7 +125,7 @@ const AppContent: React.FC = () => {
                         marginRight: '10px',
                     }}
                 >
-                    {userId !== -1 ? (
+                    {userId !== null ? (
                         <Link
                             to='/'
                             style={{
@@ -187,10 +156,10 @@ const AppContent: React.FC = () => {
             <Routes>
                 <Route path='/' element={<Landing/>}/>
                 <Route path={gallery_path} element={<Gallery userDir={userDir}/>}/>
-                <Route path={upload_path} element={<UploadPage useDirectory={userDir}/>}/>
+                <Route path={upload_path} element={<UploadPage userDir={userDir}/>}/>
                 <Route path={login_path} element={<Login/>}/>
                 <Route path={signup_path} element={<Signup/>}/>
-                <Route path={dashboard_path} element={<Dashboard authUserId={userId} authUsername={username}/>}/>
+                <Route path={dashboard_path} element={<Dashboard authUsername={username}/>}/>
             </Routes>
         </>
     );

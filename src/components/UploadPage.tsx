@@ -3,10 +3,10 @@ import React, {useState} from "react";
 import axios from "axios";
 
 interface UploadProps {
-    useDirectory: string | null;
+    userDir: string | null;
 }
 
-const UploadPage: React.FC<UploadProps> = ({useDirectory}) => {
+const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -55,7 +55,7 @@ const UploadPage: React.FC<UploadProps> = ({useDirectory}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`${import.meta.env.VITE_HOST}/api/upload/${useDirectory}`, formData, {
+                await axios.post(`${import.meta.env.VITE_HOST}/api/upload/${userDir}`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,

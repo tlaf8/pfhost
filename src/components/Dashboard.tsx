@@ -1,22 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, {useState} from 'react';
 
 interface DashboardProps {
-    authUserId: number | null,
     authUsername: string | null
 }
 
 const Dashboard: React.FC<DashboardProps> = ({authUsername}) => {
-    const navigate = useNavigate();
     const [error] = useState<string | null>(null);
-
-    useEffect(() => {
-        const token = sessionStorage.getItem('authToken');
-
-        if (!token) {
-            navigate('/');
-        }
-    }, [navigate]);
 
     return (
         <div style={{
