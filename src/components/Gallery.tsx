@@ -25,6 +25,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     };
 
     const fetchBlobUrl = useCallback(async (filename: string) => {
+        alert('Need to fetch again... Please wait')
         try {
             const token = sessionStorage.getItem('authToken');
 
@@ -35,10 +36,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                 responseType: 'blob'
             });
 
-            // Create blob URL
             const blobUrl = URL.createObjectURL(response.data);
-
-            // Update blob URLs state
             setBlobUrls(prev => ({
                 ...prev,
                 [filename]: blobUrl
@@ -74,7 +72,6 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         });
     }, [userDir]);
 
-    // Clean up blob URLs when component unmounts
     useEffect(() => {
         return () => {
             Object.values(blobUrls).forEach(URL.revokeObjectURL);
