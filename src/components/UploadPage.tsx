@@ -55,7 +55,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`${import.meta.env.VITE_HOST}/api/upload/${userDir}`, formData, {
+                await axios.post(`http://localhost:9999/api/upload/${userDir}`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,

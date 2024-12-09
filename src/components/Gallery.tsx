@@ -29,7 +29,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         try {
             const token = sessionStorage.getItem('authToken');
 
-            const response = await axios.get(`${import.meta.env.VITE_HOST}/${userDir}/media/${filename}`, {
+            const response = await axios.get(`http://localhost:9999/api/${userDir}/media/${filename}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
@@ -53,7 +53,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         const fetchMediaThumbnails = async () => {
             try {
                 const token = sessionStorage.getItem('authToken');
-                const response = await axios.get(`${import.meta.env.VITE_HOST}/${userDir}/thumbnails`, {
+                const response = await axios.get(`http://localhost:9999/api/${userDir}/thumbnails`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

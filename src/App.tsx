@@ -24,7 +24,7 @@ const AppContent: React.FC = () => {
         try {
             const token = sessionStorage.getItem('authToken');
             if (!token) return;
-            const response = await axios.get(`${import.meta.env.VITE_HOST}/api/token`, {
+            const response = await axios.get(`http://localhost:9999/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

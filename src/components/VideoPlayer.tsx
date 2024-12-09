@@ -16,7 +16,7 @@ const VideoPlayer: React.FC = () => {
                 const token = sessionStorage.getItem('authToken');
 
                 // Fetch video file
-                const response = await axios.get(`${import.meta.env.VITE_HOST}/${userDir}/file/${filename}`, {
+                const response = await axios.get(`http://localhost:9999/api/${userDir}/file/${filename}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },

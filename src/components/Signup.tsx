@@ -19,7 +19,7 @@ const SignUpPage: React.FC = () => {
             setError('Passwords do not match.');
         } else {
             try {
-                const response = await axios.post(`${import.meta.env.VITE_HOST}/api/register`, {
+                const response = await axios.post(`http://localhost:9999/api/register`, {
                     username,
                     email,
                     password
