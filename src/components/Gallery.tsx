@@ -25,17 +25,20 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     };
 
     const fetchBlobUrl = useCallback(async (filename: string) => {
-        alert('Need to fetch again... Please wait')
         try {
             const token = sessionStorage.getItem('authToken');
 
-            const response = await axios.get(`http://localhost:9999/api/${userDir}/media/${filename}`, {
+            console.log('Sending request for blobUrl')
+            const response = await axios.get(`https://3dd3e179.duckdns.org/api/media`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'path': userDir,
+                    'filename': filename
                 },
                 responseType: 'blob'
             });
 
+            console.log(response);
             const blobUrl = URL.createObjectURL(response.data);
             setBlobUrls(prev => ({
                 ...prev,
@@ -53,11 +56,15 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         const fetchMediaThumbnails = async () => {
             try {
                 const token = sessionStorage.getItem('authToken');
-                const response = await axios.get(`http://localhost:9999/api/${userDir}/thumbnails`, {
+                console.log('Sending request for thumbnails')
+                const response = await axios.get(`https://3dd3e179.duckdns.org/api/thumbnails`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'path': userDir,
+                        'filename': ''
                     }
                 });
+                console.log(response);
 
                 setMedia(response.data);
                 setIsLoading(false);

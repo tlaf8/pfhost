@@ -24,7 +24,7 @@ const AppContent: React.FC = () => {
         try {
             const token = sessionStorage.getItem('authToken');
             if (!token) return;
-            const response = await axios.get(`http://localhost:9999/api/token`, {
+            const response = await axios.get(`https://3dd3e179.duckdns.org/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -55,10 +55,12 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`http://localhost:9999/api/upload/${userDir}`, formData, {
+                await axios.post(`https://3dd3e179.duckdns.org/api/upload`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,
+                        'path': userDir,
+                        'filename': ''
                     }, onUploadProgress: (progressEvent) => {
                         const percentage = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
                         setUploadProgress(percentage);
