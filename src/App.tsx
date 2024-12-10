@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Link, Route, Routes, useNavigate} from 'react-router-dom';
+import {BrowserRouter as Router, Link, Route, Routes, useNavigate, useLocation} from 'react-router-dom';
 import React, {useCallback, useEffect, useState} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
@@ -18,9 +18,11 @@ const AppContent: React.FC = () => {
     const [username, setUsername] = useState<string | null>(null);
     const [userDir, setUserDir] = useState<string | null>(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const validateSession = useCallback(async () => {
         try {
+            if (location.pathname === '/signup' || location.pathname === '/login') return;
             const token = sessionStorage.getItem('authToken');
             if (!token) throw new Error('No token found');
 
