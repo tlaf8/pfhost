@@ -29,7 +29,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         async (filename: string) => {
             try {
                 const token = sessionStorage.getItem('authToken');
-
+                if (!token) return;
                 const response = await axios.get(`https://3dd3e179.duckdns.org/api/media`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -68,6 +68,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         const fetchMediaThumbnails = async () => {
             try {
                 const token = sessionStorage.getItem('authToken');
+                if (!token) return;
                 const response = await axios.get(`https://3dd3e179.duckdns.org/api/thumbnails`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -98,22 +99,22 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     return (
         <div style={{marginTop: '70px'}}>
             {isLoading && (
-                <div className="spinner-container" style={{
+                <div className='spinner-container' style={{
                     marginLeft: '10px',
                     marginTop: '15px',
                 }}>
-                    <div className="loader"></div>
+                    <div className='loader'></div>
                 </div>
             )}
             <Masonry
                 breakpointCols={breakpointColumnsObj}
-                className="masonry-grid"
-                columnClassName="masonry-grid-column"
+                className='masonry-grid'
+                columnClassName='masonry-grid-column'
             >
                 {media.map((file: MediaFile, index) => (
                     <div
                         key={index}
-                        className="media-container"
+                        className='media-container'
                         style={{
                             padding: '5px',
                         }}
@@ -130,7 +131,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                             onClick={(e) => handleFileClick(e, file.filename)}
                         />
                         <a
-                            href="#"
+                            href='#'
                             onClick={(e) => handleFileClick(e, file.filename)}
                             style={{
                                 display: 'block',

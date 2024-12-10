@@ -51,7 +51,7 @@ const AppContent: React.FC = () => {
             setUserDir(null);
             navigate('/login');
         }
-    }, [navigate]);
+    }, [location.pathname, navigate]);
 
     useEffect(() => {
         validateSession().catch((error) => {
@@ -64,7 +64,7 @@ const AppContent: React.FC = () => {
         setUserId(null);
         setUsername(null);
         setUserDir(null);
-        navigate('/');
+        navigate('/login');
     };
 
     return (
@@ -85,15 +85,29 @@ const AppContent: React.FC = () => {
                 }}
             >
                 <div style={{display: 'flex'}}>
-                    <Link to='/dashboard' className='link'>Home</Link>
-                    <Link to={gallery_path} className='link'>Gallery</Link>
-                    <Link to={upload_path} className='link'>Upload</Link>
+                    {(userId !== null) ? (
+                        <Link to='/dashboard' className='link'>Home</Link>
+                    ) : (
+                        <Link to='/login' className='link' style={{color: 'grey'}}>Home</Link>
+                    )}
+
+                    {(userId !== null) ? (
+                        <Link to={gallery_path} className='link'>Gallery</Link>
+                    ) : (
+                        <Link to='/login' className='link' style={{color: 'grey'}}>Gallery</Link>
+                    )}
+
+                    {(userId !== null) ? (
+                        <Link to={upload_path} className='link'>Upload</Link>
+                    ) : (
+                        <Link to='/login' className='link' style={{color: 'grey'}}>Upload</Link>
+                    )}
                 </div>
                 <div style={{display: 'flex', marginRight: '10px'}}>
                     {userId !== null ? (
-                        <Link to='/' className='link' onClick={handleLogout}>Logout</Link>
+                        <Link to='/login' className='link' onClick={handleLogout}>Logout</Link>
                     ) : (
-                        <p style={{ color: 'black', marginRight: '10px'}}>Not logged in</p>
+                        <p style={{ color: 'black', marginRight: '10px'}}></p>
                     )}
                 </div>
             </nav>
