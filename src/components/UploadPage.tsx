@@ -55,7 +55,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`https://3dd3e179.duckdns.org/api/upload`, formData, {
+                await axios.post(`https://pfhost.duckdns.org/api/upload`, formData, {
                     headers: {
                         'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -171,7 +171,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                 </button>
 
                 <Link
-                    to="/"
+                    to="/dashboard"
                     style={{
                         display: "inline-block",
                         border: "2px solid black",

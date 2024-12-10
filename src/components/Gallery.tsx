@@ -30,7 +30,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
             try {
                 const token = sessionStorage.getItem('authToken');
                 if (!token) return;
-                const response = await axios.get(`https://3dd3e179.duckdns.org/api/media`, {
+                const response = await axios.get(`https://pfhost.duckdns.org/api/media`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         path: userDir,
@@ -69,7 +69,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
             try {
                 const token = sessionStorage.getItem('authToken');
                 if (!token) return;
-                const response = await axios.get(`https://3dd3e179.duckdns.org/api/thumbnails`, {
+                const response = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         path: userDir,
