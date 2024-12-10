@@ -16,55 +16,65 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     const [media, setMedia] = useState<MediaFile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
+    const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
 
     const breakpointColumnsObj = {
         default: 4,
         1100: 3,
         700: 2,
-        500: 1
+        500: 1,
     };
 
-    const fetchBlobUrl = useCallback(async (filename: string) => {
-        try {
-            const token = sessionStorage.getItem('authToken');
+    const fetchBlobUrl = useCallback(
+        async (filename: string) => {
+            try {
+                const token = sessionStorage.getItem('authToken');
 
-            console.log('Sending request for blobUrl')
-            const response = await axios.get(`https://3dd3e179.duckdns.org/api/media`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'path': userDir,
-                    'filename': filename
-                },
-                responseType: 'blob'
-            });
+                const response = await axios.get(`https://3dd3e179.duckdns.org/api/media`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        path: userDir,
+                        filename: filename,
+                    },
+                    responseType: 'blob',
+                });
 
-            console.log(response);
-            const blobUrl = URL.createObjectURL(response.data);
-            setBlobUrls(prev => ({
-                ...prev,
-                [filename]: blobUrl
-            }));
+                const blobUrl = URL.createObjectURL(response.data);
+                setBlobUrls((prev) => ({
+                    ...prev,
+                    [filename]: blobUrl,
+                }));
 
-            return blobUrl;
-        } catch (error) {
-            console.error(`Error fetching blob for ${filename}:`, error);
-            return null;
+                return blobUrl;
+            } catch (error) {
+                console.error(`Error fetching blob for ${filename}:`, error);
+                return null;
+            }
+        },
+        [userDir]
+    );
+
+    const handleFileClick = async (e: React.MouseEvent, filename: string) => {
+        e.preventDefault();
+        setFetchingFile((prev) => ({...prev, [filename]: true}));
+        const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
+        if (blobUrl) {
+            window.open(blobUrl, '_blank');
         }
-    }, [userDir]);
+        setFetchingFile((prev) => ({...prev, [filename]: false}));
+    };
 
     useEffect(() => {
         const fetchMediaThumbnails = async () => {
             try {
                 const token = sessionStorage.getItem('authToken');
-                console.log('Sending request for thumbnails')
                 const response = await axios.get(`https://3dd3e179.duckdns.org/api/thumbnails`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'path': userDir,
-                        'filename': ''
-                    }
+                        Authorization: `Bearer ${token}`,
+                        path: userDir,
+                        filename: '',
+                    },
                 });
-                console.log(response);
 
                 setMedia(response.data);
                 setIsLoading(false);
@@ -87,7 +97,14 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
 
     return (
         <div style={{marginTop: '70px'}}>
-            {isLoading && <div>Loading...</div>}
+            {isLoading && (
+                <div className="spinner-container" style={{
+                    marginLeft: '10px',
+                    marginTop: '15px',
+                }}>
+                    <div className="loader"></div>
+                </div>
+            )}
             <Masonry
                 breakpointCols={breakpointColumnsObj}
                 className="masonry-grid"
@@ -107,26 +124,22 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                                 width: '100%',
                                 display: 'block',
                                 borderRadius: '3px',
+                                cursor: 'pointer',
                             }}
                             alt={file.filename}
+                            onClick={(e) => handleFileClick(e, file.filename)}
                         />
                         <a
                             href="#"
-                            onClick={async (e) => {
-                                e.preventDefault();
-                                const blobUrl = blobUrls[file.filename] || await fetchBlobUrl(file.filename);
-                                if (blobUrl) {
-                                    window.open(blobUrl, '_blank');
-                                }
-                            }}
+                            onClick={(e) => handleFileClick(e, file.filename)}
                             style={{
                                 display: 'block',
-                                marginTop: '10px',
+                                marginTop: '5px',
                                 textDecoration: 'none',
-                                color: 'blue',
+                                color: '#007bff',
                             }}
                         >
-                            {file.filename}
+                            {fetchingFile[file.filename] ? `${file.filename} | Fetching...` : file.filename}
                         </a>
                     </div>
                 ))}

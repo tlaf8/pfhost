@@ -89,33 +89,19 @@ const AppContent: React.FC = () => {
                 >
                     <Link
                         to='/dashboard'
-                        style={{
-                            textDecoration: 'none',
-                            padding: '10px',
-                            color: 'black',
-                        }}
+                        className='link'
                     >
                         Home
                     </Link>
                     <Link
                         to={gallery_path}
-                        style={{
-                            textDecoration: 'none',
-                            padding: '10px',
-                            pointerEvents: (userId !== null) ? 'auto' : 'none',
-                            color: (userId !== null) ? 'black' : 'gray',
-                        }}
+                        className='link'
                     >
                         Gallery
                     </Link>
                     <Link
                         to={upload_path}
-                        style={{
-                            textDecoration: 'none',
-                            padding: '10px',
-                            pointerEvents: (userId !== null) ? 'auto' : 'none',
-                            color: (userId !== null) ? 'black' : 'gray',
-                        }}
+                        className='link'
                     >
                         Upload
                     </Link>
@@ -129,12 +115,7 @@ const AppContent: React.FC = () => {
                     {userId !== null ? (
                         <Link
                             to='/'
-                            style={{
-                                textDecoration: 'none',
-                                color: 'black',
-                                padding: '10px',
-                                cursor: 'pointer',
-                            }}
+                            className='link'
                             onClick={handleLogout}
                         >
                             Logout
@@ -142,12 +123,7 @@ const AppContent: React.FC = () => {
                     ) : (
                         <Link
                             to={login_path}
-                            style={{
-                                textDecoration: 'none',
-                                color: 'black',
-                                padding: '10px',
-                                cursor: 'pointer',
-                            }}
+                            className='link'
                         >
                             Login
                         </Link>

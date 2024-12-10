@@ -15,9 +15,10 @@ const Dashboard: React.FC<DashboardProps> = ({authUsername}) => {
             <p style={{
                 fontSize: '20px',
             }}>
-                Welcome back, {authUsername}.
+                Welcome back, <span style={{
+                    color: '#007bff',
+                }}>{authUsername}</span>.
             </p>
-
             {error && <p style={{color: 'red', fontSize: '14px'}}>{error}</p>}
         </div>
     );
