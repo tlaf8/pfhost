@@ -2,7 +2,6 @@ import {BrowserRouter as Router, Link, Route, Routes, useNavigate} from 'react-r
 import React, {useCallback, useEffect, useState} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
-import Landing from './components/Landing';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
@@ -23,7 +22,8 @@ const AppContent: React.FC = () => {
     const validateSession = useCallback(async () => {
         try {
             const token = sessionStorage.getItem('authToken');
-            if (!token) return;
+            if (!token) throw new Error('No token found');
+
             const response = await axios.get(`https://3dd3e179.duckdns.org/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -82,56 +82,20 @@ const AppContent: React.FC = () => {
                     zIndex: 9999,
                 }}
             >
-                <div
-                    style={{
-                        display: 'flex',
-                    }}
-                >
-                    <Link
-                        to='/dashboard'
-                        className='link'
-                    >
-                        Home
-                    </Link>
-                    <Link
-                        to={gallery_path}
-                        className='link'
-                    >
-                        Gallery
-                    </Link>
-                    <Link
-                        to={upload_path}
-                        className='link'
-                    >
-                        Upload
-                    </Link>
+                <div style={{display: 'flex'}}>
+                    <Link to='/dashboard' className='link'>Home</Link>
+                    <Link to={gallery_path} className='link'>Gallery</Link>
+                    <Link to={upload_path} className='link'>Upload</Link>
                 </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        marginRight: '10px',
-                    }}
-                >
+                <div style={{display: 'flex', marginRight: '10px'}}>
                     {userId !== null ? (
-                        <Link
-                            to='/'
-                            className='link'
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </Link>
+                        <Link to='/' className='link' onClick={handleLogout}>Logout</Link>
                     ) : (
-                        <Link
-                            to={login_path}
-                            className='link'
-                        >
-                            Login
-                        </Link>
+                        <p style={{ color: 'black', marginRight: '10px'}}>Not logged in</p>
                     )}
                 </div>
             </nav>
             <Routes>
-                <Route path='/' element={<Landing/>}/>
                 <Route path={gallery_path} element={<Gallery userDir={userDir}/>}/>
                 <Route path={upload_path} element={<UploadPage userDir={userDir}/>}/>
                 <Route path={login_path} element={<Login/>}/>
