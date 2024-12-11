@@ -11,6 +11,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [linkInput, setLinkInput] = useState<string>("");
+    const [filenameInput, setFilenameInput] = useState<string>("");
     const [uploadProgress, setUploadProgress] = useState<number>(0);
 
     const can_accept = (path: string) => {
@@ -38,6 +39,10 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const handleLinkInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLinkInput(event.target.value);
     };
+
+    const handleFilenameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFilenameInput(event.target.value);
+    }
 
     const handleUpload = async () => {
         if (loading) return;
@@ -109,7 +114,13 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     };
 
     return (
-        <div style={{textAlign: "center", marginTop: "100px"}}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '75vh'
+        }}>
             <input
                 type="file"
                 onChange={handleFileChange}
@@ -143,6 +154,19 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     value={linkInput}
                     onChange={handleLinkInputChange}
                     placeholder="Enter a link to upload"
+                    style={{
+                        border: "2px solid black", borderRadius: "5px", padding: "5px", margin: "10px", width: "250px"
+                    }}
+                />
+            </div>
+
+            <div>
+                <input
+                    id='filenameIn'
+                    type='text'
+                    value={filenameInput}
+                    onChange={handleFilenameInputChange}
+                    placeholder="Enter custom file name"
                     style={{
                         border: "2px solid black", borderRadius: "5px", padding: "5px", margin: "10px", width: "250px"
                     }}
@@ -202,12 +226,13 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                                 width: `${uploadProgress}%`,
                                 height: "100%",
                                 backgroundColor: "#4CAF50",
-                                transition: "width 0.3s ease-in-out"
+                                transition: "width 0.3s ease-in-out",
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                color: 'white'
                             }}
-                        />
-                    </div>
-                    <div style={{marginTop: "5px"}}>
-                        {uploadProgress}%
+                        >{uploadProgress}%</div>
                     </div>
                 </div>
             )}

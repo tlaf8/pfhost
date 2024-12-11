@@ -25,6 +25,16 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         500: 1,
     };
 
+    const handleFileClick = async (e: React.MouseEvent, filename: string) => {
+        e.preventDefault();
+        setFetchingFile((prev) => ({...prev, [filename]: true}));
+        const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
+        if (blobUrl) {
+            window.open(blobUrl, '_blank');
+        }
+        setFetchingFile((prev) => ({...prev, [filename]: false}));
+    };
+
     const fetchBlobUrl = useCallback(
         async (filename: string) => {
             try {
@@ -53,16 +63,6 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         },
         [userDir]
     );
-
-    const handleFileClick = async (e: React.MouseEvent, filename: string) => {
-        e.preventDefault();
-        setFetchingFile((prev) => ({...prev, [filename]: true}));
-        const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
-        if (blobUrl) {
-            window.open(blobUrl, '_blank');
-        }
-        setFetchingFile((prev) => ({...prev, [filename]: false}));
-    };
 
     useEffect(() => {
         const fetchMediaThumbnails = async () => {
@@ -100,8 +100,10 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         <div style={{marginTop: '70px'}}>
             {isLoading && (
                 <div className='spinner-container' style={{
-                    marginLeft: '10px',
-                    marginTop: '15px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '75vh'
                 }}>
                     <div className='loader'></div>
                 </div>
