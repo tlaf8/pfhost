@@ -18,7 +18,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const ctrlRef = useRef<AbortController | null>(null);
 
     const can_accept = (path: string) => {
-        return /\.(mp3|ogg|mp4|mov|webm|avi|png|jpeg|jpg|gif)$/i.test(path);
+        return /\.(mp3|ogg|opus|wav|aac|m4a|mp4|m4v|mov|webm|ogv|png|jpeg|jpg|gif|webp|svg|bmp|ico)$/i.test(path);
     };
 
     const handleClear = () => {
@@ -46,7 +46,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         const file = event.target.files?.[0];
         if (file) {
             if (!can_accept(file.name)) {
-                alert("Cannot upload files of this type\nAccepted types are: mp3, mp4, mov, webm, avi, ogg, png, jpg/jpeg, gif");
+                alert("Cannot upload files of this type. Accepted types are: mp3, ogg, mp4, mov, webm, ogv, jpeg, jpg, png, gif, bmp, ico, svg, m4v, aac, opus, wav, webp");
                 handleClear();
                 return;
             }
@@ -81,13 +81,6 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             }
             const formData = new FormData();
             formData.append("file", selectedFile);
-
-            console.log({
-                Authorization: `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'path': userDir,
-                    'filename': (filenameInput === '') ? selectedFile.name : `${filenameInput}.${selectedFile.name.split('.')[1]}`,
-            })
 
             try {
                 await axios.post(`https://pfhost.duckdns.org/api/upload`, formData, {
@@ -130,13 +123,6 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         } else if (linkInput) {
             setError("Link upload is not supported yet.");
             handleClear()
-            // const result = await axios.get(`${hostname}${yoink_path}?url=${encodeURI(linkInput)}`);
-            // if (result.status === 200) {
-            //     alert('File downloaded successfully');
-            // }
-            // if (result.status === 201) {
-            //     alert(`Could not download video: ${result.data}`)
-            // }
         } else {
             setError("Please select a file or enter a link.");
         }
