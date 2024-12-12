@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import axios from "axios";
 
 interface UploadProps {
@@ -12,19 +12,33 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [linkInput, setLinkInput] = useState<string>("");
     const [filenameInput, setFilenameInput] = useState<string>("");
-    const [uploadProgress, setUploadProgress] = useState<number>(0);
+    const [uploadProgress, setUploadProgress] = useState<string>('0');
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const ctrlRef = useRef<AbortController | null>(null);
 
     const can_accept = (path: string) => {
         return /\.(mp3|ogg|mp4|mov|webm|avi|png|jpeg|jpg|gif)$/i.test(path);
     };
 
     const handleClear = () => {
+        if (loading) return;
         setSelectedFile(null);
         setPreviewUrl(null);
+        setError(null);
         setLinkInput("");
+        setFilenameInput("");
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         if (fileInput) {
             fileInput.value = '';
+        }
+    }
+
+    const handleCancel = () => {
+        if (ctrlRef.current) {
+            ctrlRef.current.abort();
+        } else {
+            setError('No controller reference');
         }
     }
 
@@ -52,54 +66,69 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const handleUpload = async () => {
         if (loading) return;
 
+        const controller = new AbortController();
+        ctrlRef.current = controller;
         setLoading(true);
-        setUploadProgress(0);
+        setSuccess(null);
+        setError(null);
+        setUploadProgress('0');
 
         if (selectedFile) {
             const token = sessionStorage.getItem('authToken');
             if (!token || !userDir) {
-                console.error('Could not load token');
+                setError('Could not find token');
                 return;
             }
             const formData = new FormData();
             formData.append("file", selectedFile);
 
+            console.log({
+                Authorization: `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'path': userDir,
+                    'filename': (filenameInput === '') ? selectedFile.name : `${filenameInput}.${selectedFile.name.split('.')[1]}`,
+            })
+
             try {
                 await axios.post(`https://pfhost.duckdns.org/api/upload`, formData, {
+                    signal: controller.signal,
                     headers: {
-                        'Accept': 'application/json',
                         Authorization: `Bearer ${token}`,
+                        'Accept': 'application/json',
                         'path': userDir,
-                        'filename': ''
+                        'filename': (filenameInput === '') ? selectedFile.name : `${filenameInput}.${selectedFile.name.split('.')[1]}`,
                     }, onUploadProgress: (progressEvent) => {
                         const percentage = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
-                        setUploadProgress(percentage);
+                        setUploadProgress(percentage.toString());
                     }
                 });
 
-                alert("File uploaded successfully");
-                setSelectedFile(null);
-                setPreviewUrl(null);
-                setUploadProgress(0);
+                setSuccess("File uploaded successfully");
+                handleClear();
+                setUploadProgress('0');
             } catch (err) {
-                console.error("Error uploading file: ", err);
-                if (axios.isAxiosError(err)) {
-                    console.error('Error details:', {
-                        status: err.response?.status,
-                        statusText: err.response?.statusText,
-                        data: err.response?.data,
-                        headers: err.response?.headers
-                    });
-
-                    const errorMessage = err.response?.data?.message || err.response?.data || err.message;
-                    alert(`Upload failed: ${errorMessage}`);
+                if (axios.isCancel(err)) {
+                    setError('Upload cancelled');
+                } else if (axios.isAxiosError(err)) {
+                    if (err.status === 409) {
+                        setError('File already exists. Please enter a new name');
+                    } else {
+                        setError(`Upload failed. Check console for details`);
+                        console.error('Error details:', {
+                            status: err.response?.status,
+                            statusText: err.response?.statusText,
+                            data: err.response?.data,
+                            headers: err.response?.headers
+                        });
+                    }
                 } else {
-                    alert("Failed to upload file. Check console for details");
+                    setError('Unknown error occurred. Check console for details')
+                    console.error(error);
                 }
-                setUploadProgress(0);
+                setUploadProgress('0');
             }
         } else if (linkInput) {
-            alert("Link upload is not supported yet.");
+            setError("Link upload is not supported yet.");
             handleClear()
             // const result = await axios.get(`${hostname}${yoink_path}?url=${encodeURI(linkInput)}`);
             // if (result.status === 200) {
@@ -109,7 +138,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             //     alert(`Could not download video: ${result.data}`)
             // }
         } else {
-            alert("Please select a file or enter a link.");
+            setError("Please select a file or enter a link.");
         }
 
         setLoading(false);
@@ -136,22 +165,23 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             />
 
             <div style={{marginBottom: "5px"}}>
-                {previewUrl && (<div style={{marginTop: "15px"}}>
-                    {selectedFile?.type.startsWith("video") ? (<video
-                        muted
-                        autoPlay
-                        playsInline
-                        src={previewUrl}
-                        controls
-                        style={{width: "10vw", height: "auto"}}
-                    />) : (<img
-                        src={previewUrl}
-                        alt="preview"
-                        style={{width: "10vw", height: "auto"}}
-                    />)}
-                </div>)}
-            </div>or
-
+                {previewUrl && (
+                    <div style={{marginTop: "15px"}}>
+                        {selectedFile?.type.startsWith("video") ? (<video
+                            muted
+                            autoPlay
+                            playsInline
+                            src={previewUrl}
+                            controls
+                            style={{width: "auto", height: "20vh"}}
+                        />) : (<img
+                            src={previewUrl}
+                            alt="preview"
+                            style={{width: "auto", height: "20vh"}}
+                        />)}
+                    </div>)}
+            </div>
+            or
             <div>
                 <input
                     type="text"
@@ -182,22 +212,41 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px"
                 }}
             >
-                <button
-                    onClick={handleUpload}
-                    style={{
-                        display: "inline-block",
-                        border: "2px solid black",
-                        borderRadius: "5px",
-                        fontSize: "12px",
-                        padding: "5px 10px",
-                        textDecoration: "none",
-                        backgroundColor: "#fff",
-                        color: "#000"
-                    }}
-                    disabled={loading}
-                >
-                    {loading ? "Uploading..." : "Upload"}
-                </button>
+                {loading ? (
+                    <button
+                        onClick={handleCancel}
+                        style={{
+                            display: "inline-block",
+                            border: "2px solid black",
+                            borderRadius: "5px",
+                            fontSize: "12px",
+                            padding: "5px 10px",
+                            textDecoration: "none",
+                            backgroundColor: "#fff",
+                            color: "#000",
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Cancel
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleUpload}
+                        style={{
+                            display: "inline-block",
+                            border: "2px solid black",
+                            borderRadius: "5px",
+                            fontSize: "12px",
+                            padding: "5px 10px",
+                            textDecoration: "none",
+                            backgroundColor: "#fff",
+                            color: "#000",
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Upload
+                    </button>
+                )}
 
                 <button
                     onClick={handleClear}
@@ -209,14 +258,15 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                         padding: "5px 10px",
                         textDecoration: "none",
                         backgroundColor: "#fff",
-                        color: "#000"
+                        color: "#000",
+                        cursor: 'pointer',
                     }}
                 >
                     Clear
                 </button>
 
                 <Link
-                    to="/dashboard"
+                    to={loading ? '#' : '/dashboard'}
                     style={{
                         display: "inline-block",
                         border: "2px solid black",
@@ -231,6 +281,9 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     Back
                 </Link>
             </div>
+
+            {error && (<p style={{color: 'red'}}>{error}</p>)}
+            {success && (<p style={{color: 'green'}}>File uploaded successfully</p>)}
 
             {loading && selectedFile && (<div style={{
                     marginTop: "20px", width: "300px", margin: "20px auto"
@@ -254,7 +307,8 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                                 alignItems: 'center',
                                 color: 'white'
                             }}
-                        >{uploadProgress}%</div>
+                        >{(uploadProgress !== '100') ? (`${uploadProgress}%`) : ('Processing...')}
+                        </div>
                     </div>
                 </div>
             )}
