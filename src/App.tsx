@@ -24,7 +24,7 @@ const AppContent: React.FC = () => {
         try {
             if (location.pathname === '/signup' || location.pathname === '/login') return;
             const token = sessionStorage.getItem('authToken');
-            if (!token) throw new Error('No token found');
+            if (!token) handleLogout();
 
             const response = await axios.get(`https://pfhost.duckdns.org/api/token`, {
                 headers: {
@@ -45,11 +45,7 @@ const AppContent: React.FC = () => {
             } else {
                 console.error('An unknown error occurred. Please log in again.');
             }
-            sessionStorage.removeItem('authToken');
-            setUserId(null);
-            setUsername(null);
-            setUserDir(null);
-            navigate('/login');
+            handleLogout()
         }
     }, [location.pathname, navigate]);
 

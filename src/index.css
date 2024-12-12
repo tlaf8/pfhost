@@ -25,115 +25,39 @@ div {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.loader {
-    animation: rotate 1s infinite;
-    height: 50px;
-    width: 50px;
+.dots {
+    width: 13.4px;
+    height: 13.4px;
+    position: relative;
 }
 
-.loader:before,
-.loader:after {
-    border-radius: 50%;
+.dots::before,
+.dots::after {
     content: "";
-    display: block;
-    height: 20px;
-    width: 20px;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #007bff;
 }
 
-.loader:before {
-    animation: ball1 1s infinite;
-    background-color: #007bff;
-    box-shadow: 30px 0 0 #66b3ff;
-    margin-bottom: 10px;
+.dots::before {
+    box-shadow: -26.9px 0 #007bff;
+    animation: dots-dm1l1cmd 0.36s infinite linear;
 }
 
-.loader:after {
-    animation: ball2 1s infinite;
-    background-color: #66b3ff;
-    box-shadow: 30px 0 0 #99ccff;
+.dots::after {
+    transform: rotate(0deg) translateX(26.9px);
+    animation: dots-dh1qq5md 0.36s infinite linear;
 }
 
-.loader .ball3 {
-    animation: ball3 1s infinite;
-    background-color: #99ccff;
-    box-shadow: 30px 0 0 #cce0ff;
-    margin-bottom: 10px;
-}
-
-.loader .ball4 {
-    animation: ball4 1s infinite;
-    background-color: #cce0ff;
-    box-shadow: 30px 0 0 #cce0ff;
-}
-
-@keyframes rotate {
-    0% {
-        transform: rotate(0deg) scale(0.8)
-    }
-    50% {
-        transform: rotate(360deg) scale(1.2)
-    }
+@keyframes dots-dm1l1cmd {
     100% {
-        transform: rotate(720deg) scale(0.8)
+        transform: translateX(26.9px);
     }
 }
 
-@keyframes ball1 {
-    0% {
-        box-shadow: 30px 0 0 #66b3ff;
-    }
-    50% {
-        box-shadow: 0 0 0 #66b3ff;
-        margin-bottom: 0;
-        transform: translate(15px, 15px);
-    }
+@keyframes dots-dh1qq5md {
     100% {
-        box-shadow: 30px 0 0 #66b3ff;
-        margin-bottom: 10px;
-    }
-}
-
-@keyframes ball2 {
-    0% {
-        box-shadow: 30px 0 0 #99ccff;
-    }
-    50% {
-        box-shadow: 0 0 0 #99ccff;
-        margin-top: -20px;
-        transform: translate(15px, 15px);
-    }
-    100% {
-        box-shadow: 30px 0 0 #99ccff;
-        margin-top: 0;
-    }
-}
-
-@keyframes ball3 {
-    0% {
-        box-shadow: 30px 0 0 #cce0ff;
-    }
-    50% {
-        box-shadow: 0 0 0 #cce0ff;
-        margin-top: -20px;
-        transform: translate(15px, 15px);
-    }
-    100% {
-        box-shadow: 30px 0 0 #cce0ff;
-        margin-top: 0;
-    }
-}
-
-@keyframes ball4 {
-    0% {
-        box-shadow: 30px 0 0 #cce0ff;
-    }
-    50% {
-        box-shadow: 0 0 0 #cce0ff;
-        margin-top: -20px;
-        transform: translate(15px, 15px);
-    }
-    100% {
-        box-shadow: 30px 0 0 #cce0ff;
-        margin-top: 0;
+        transform: rotate(-180deg) translateX(26.9px);
     }
 }

@@ -16,14 +16,8 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     const [media, setMedia] = useState<MediaFile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
-    const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
-
-    const breakpointColumnsObj = {
-        default: 4,
-        1100: 3,
-        700: 2,
-        500: 1,
-    };
+    const [fetchingFile, setFetchingFile] = useState<{[filename: string]: boolean}>({});
+    const breakpointColumnsObj = {default: 4, 1100: 3, 700: 2, 500: 1,};
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
@@ -39,7 +33,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         async (filename: string) => {
             try {
                 const token = sessionStorage.getItem('authToken');
-                if (!token) return;
+                if (!token || !userDir) return;
                 const response = await axios.get(`https://pfhost.duckdns.org/api/media`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -64,31 +58,48 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
         [userDir]
     );
 
-    useEffect(() => {
-        const fetchMediaThumbnails = async () => {
+    const fetchMediaThumbnails = useCallback(
+        async () => {
             try {
                 const token = sessionStorage.getItem('authToken');
-                if (!token) return;
+                if (!token || !userDir) return;
+
                 const response = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         path: userDir,
-                        filename: '',
+                        filename: 'gimmefiles',
                     },
                 });
 
-                setMedia(response.data);
-                setIsLoading(false);
+                const { files } = response.data;
+                for (const file of files) {
+                    const fileObject = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            path: userDir,
+                            filename: file
+                        }
+                    });
+
+                    setIsLoading(false);
+                    setMedia(prevMedia => [...prevMedia, fileObject.data]);
+                }
             } catch (error) {
                 console.error('Error fetching media:', error);
                 setIsLoading(false);
             }
-        };
+        },
+        [userDir]
+    );
 
-        fetchMediaThumbnails().catch((error) => {
-            console.error('Error fetching media:', error);
-        });
-    }, [userDir]);
+    useEffect(() => {
+        if (media.length === 0) {
+            fetchMediaThumbnails().catch((error) => {
+                console.error('Error fetching media:', error);
+            });
+        }
+    })
 
     useEffect(() => {
         return () => {
@@ -105,7 +116,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                     justifyContent: 'center',
                     height: '75vh'
                 }}>
-                    <div className='loader'></div>
+                    <div className='dots'></div>
                 </div>
             )}
             <Masonry

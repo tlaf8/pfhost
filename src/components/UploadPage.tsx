@@ -18,17 +18,22 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         return /\.(mp3|ogg|mp4|mov|webm|avi|png|jpeg|jpg|gif)$/i.test(path);
     };
 
+    const handleClear = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setLinkInput("");
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    }
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             if (!can_accept(file.name)) {
                 alert("Cannot upload files of this type\nAccepted types are: mp3, mp4, mov, webm, avi, ogg, png, jpg/jpeg, gif");
-                setSelectedFile(null);
-                setPreviewUrl(null);
-                const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-                if (fileInput) {
-                    fileInput.value = '';
-                }
+                handleClear();
                 return;
             }
             setSelectedFile(file);
@@ -52,7 +57,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
 
         if (selectedFile) {
             const token = sessionStorage.getItem('authToken');
-            if (!token) {
+            if (!token || !userDir) {
                 console.error('Could not load token');
                 return;
             }
@@ -95,6 +100,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             }
         } else if (linkInput) {
             alert("Link upload is not supported yet.");
+            handleClear()
             // const result = await axios.get(`${hostname}${yoink_path}?url=${encodeURI(linkInput)}`);
             // if (result.status === 200) {
             //     alert('File downloaded successfully');
@@ -129,24 +135,22 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                 }}
             />
 
-            <div style={{marginBottom: "10px"}}>
-                {previewUrl && (<div style={{marginTop: "20px"}}>
+            <div style={{marginBottom: "5px"}}>
+                {previewUrl && (<div style={{marginTop: "15px"}}>
                     {selectedFile?.type.startsWith("video") ? (<video
                         muted
                         autoPlay
                         playsInline
                         src={previewUrl}
                         controls
-                        style={{width: "300px", height: "auto"}}
+                        style={{width: "10vw", height: "auto"}}
                     />) : (<img
                         src={previewUrl}
                         alt="preview"
-                        style={{width: "300px", height: "auto"}}
+                        style={{width: "10vw", height: "auto"}}
                     />)}
                 </div>)}
-            </div>
-
-            <p>or</p>
+            </div>or
 
             <div>
                 <input
@@ -168,7 +172,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     onChange={handleFilenameInputChange}
                     placeholder="Enter custom file name"
                     style={{
-                        border: "2px solid black", borderRadius: "5px", padding: "5px", margin: "10px", width: "250px"
+                        border: "2px solid black", borderRadius: "5px", padding: "5px", margin: "10px", width: "200px"
                     }}
                 />
             </div>
@@ -184,6 +188,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                         display: "inline-block",
                         border: "2px solid black",
                         borderRadius: "5px",
+                        fontSize: "12px",
                         padding: "5px 10px",
                         textDecoration: "none",
                         backgroundColor: "#fff",
@@ -194,11 +199,28 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     {loading ? "Uploading..." : "Upload"}
                 </button>
 
+                <button
+                    onClick={handleClear}
+                    style={{
+                        display: "inline-block",
+                        border: "2px solid black",
+                        borderRadius: "5px",
+                        fontSize: "12px",
+                        padding: "5px 10px",
+                        textDecoration: "none",
+                        backgroundColor: "#fff",
+                        color: "#000"
+                    }}
+                >
+                    Clear
+                </button>
+
                 <Link
                     to="/dashboard"
                     style={{
                         display: "inline-block",
                         border: "2px solid black",
+                        fontSize: "12px",
                         borderRadius: "5px",
                         padding: "5px 10px",
                         textDecoration: "none",
