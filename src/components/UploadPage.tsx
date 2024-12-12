@@ -83,7 +83,6 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             formData.append("file", selectedFile);
 
             try {
-                console.log(`Begin uploading: ${selectedFile.name}`);
                 await axios.post(`https://pfhost.duckdns.org/api/upload`, formData, {
                     signal: controller.signal,
                     headers: {
