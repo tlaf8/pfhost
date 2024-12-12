@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Masonry from 'react-masonry-css';
 import axios from 'axios';
+import {Link} from "react-router-dom";
 
 interface MediaFile {
     blobThmb: string;
@@ -14,17 +15,20 @@ interface GalleryProps {
 
 const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     const [media, setMedia] = useState<MediaFile[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [uploadLinkShown, setUploadLinkShown] = useState<boolean>(false);
     const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
-    const [fetchingFile, setFetchingFile] = useState<{[filename: string]: boolean}>({});
-    const breakpointColumnsObj = {default: 4, 1100: 3, 700: 2, 500: 1,};
+    const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
+    const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
+    const breakpointColumnsObj = {default: 4, 1100: 3, 700: 2, 500: 1};
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
         setFetchingFile((prev) => ({...prev, [filename]: true}));
+        setDownloadProgress((prev) => ({...prev, [filename]: 0}));
         const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
         if (blobUrl) {
-            window.open(blobUrl, '_blank');
+            window.open(blobUrl, '_self');
         }
         setFetchingFile((prev) => ({...prev, [filename]: false}));
     };
@@ -41,6 +45,10 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                         filename: filename,
                     },
                     responseType: 'blob',
+                    onDownloadProgress: (progressEvent) => {
+                        const percentage = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
+                        setDownloadProgress((prev) => ({...prev, [filename]: percentage}));
+                    },
                 });
 
                 const blobUrl = URL.createObjectURL(response.data);
@@ -72,7 +80,13 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                     },
                 });
 
-                const { files } = response.data;
+                const {files} = response.data;
+                if (files.length === 0) {
+                    setIsLoading(false);
+                    setUploadLinkShown(true);
+                    return;
+                }
+
                 for (const file of files) {
                     const fileObject = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
                         headers: {
@@ -119,6 +133,17 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                     <div className='dots'></div>
                 </div>
             )}
+
+            {uploadLinkShown && (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '20px'
+                }}>
+                    <Link to='/upload' className='link'>No media found. Click here to start uploading</Link>
+                </div>
+            )}
+
             <Masonry
                 breakpointCols={breakpointColumnsObj}
                 className='masonry-grid'
@@ -153,7 +178,10 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                                 color: '#007bff',
                             }}
                         >
-                            {fetchingFile[file.filename] ? `${file.filename} | Fetching...` : file.filename}
+                            {file.filename}
+                            {fetchingFile[file.filename] && ` | Fetching... ${
+                                downloadProgress[file.filename] !== undefined ? `(${downloadProgress[file.filename]}%)` : ''
+                            }`}
                         </a>
                     </div>
                 ))}
