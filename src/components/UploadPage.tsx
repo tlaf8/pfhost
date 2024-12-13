@@ -6,6 +6,11 @@ interface UploadProps {
     userDir: string | null;
 }
 
+function extension(filePath: string): string {
+    const match = filePath.match(/\.([a-zA-Z0-9]+)$/);
+    return match ? `.${match[1]}` : '';
+}
+
 const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -13,6 +18,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
     const [linkInput, setLinkInput] = useState<string>("");
     const [filenameInput, setFilenameInput] = useState<string>("");
     const [uploadProgress, setUploadProgress] = useState<string>('0');
+    const [fetchingLink, setFetchingLink] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const ctrlRef = useRef<AbortController | null>(null);
@@ -73,12 +79,13 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         setError(null);
         setUploadProgress('0');
 
+        const token = sessionStorage.getItem('authToken');
+        if (!token || !userDir) {
+            setError('Could not find token');
+            return;
+        }
+
         if (selectedFile) {
-            const token = sessionStorage.getItem('authToken');
-            if (!token || !userDir) {
-                setError('Could not find token');
-                return;
-            }
             const formData = new FormData();
             formData.append("file", selectedFile);
 
@@ -87,9 +94,9 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     signal: controller.signal,
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Accept': 'application/json',
-                        'path': userDir,
-                        'filename': (filenameInput === '') ? selectedFile.name : `${filenameInput}.${selectedFile.name.split('.')[1]}`,
+                        Accept: 'application/json',
+                        path: userDir,
+                        filename: (filenameInput === '') ? selectedFile.name : `${filenameInput}${extension(selectedFile.name)}`,
                     }, onUploadProgress: (progressEvent) => {
                         const percentage = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
                         setUploadProgress(percentage.toString());
@@ -107,12 +114,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                         setError('File already exists. Please enter a new name');
                     } else {
                         setError(`Upload failed. Check console for details`);
-                        console.error('Error details:', {
-                            status: err.response?.status,
-                            statusText: err.response?.statusText,
-                            data: err.response?.data,
-                            headers: err.response?.headers
-                        });
+                        console.error('Error details:', err);
                     }
                 } else {
                     setError('Unknown error occurred. Check console for details')
@@ -121,10 +123,31 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                 setUploadProgress('0');
             }
         } else if (linkInput) {
-            setError("Link upload is not supported yet.");
-            handleClear()
+            try {
+                setFetchingLink(true);
+                await axios.get('https://pfhost.duckdns.org/api/fetchurl', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                        path: userDir,
+                        weblink: linkInput,
+                        filename: filenameInput,
+                    }
+                });
+                handleClear();
+                setFetchingLink(false);
+                setSuccess('Media downloaded successfully.')
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    if (error.status === 501) {
+                        setError('This site is currently not implemented yet');
+                    } else {
+                        setError(`Request failed: ${error.message}`);
+                    }
+                }
+            }
         } else {
-            setError("Please select a file or enter a link.");
+            setError("Please select a file or enter a link." + linkInput);
         }
 
         setLoading(false);
@@ -170,6 +193,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             or
             <div>
                 <input
+                    id="linkIn"
                     type="text"
                     value={linkInput}
                     onChange={handleLinkInputChange}
@@ -270,6 +294,17 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
 
             {error && (<p style={{color: 'red'}}>{error}</p>)}
             {success && (<p style={{color: 'green'}}>File uploaded successfully</p>)}
+
+            {fetchingLink && (
+                <div className='spinner-container' style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '75px',
+                }}>
+                    <div className='dots'></div>
+                </div>
+            )}
 
             {loading && selectedFile && (<div style={{
                     marginTop: "20px", width: "300px", margin: "20px auto"
