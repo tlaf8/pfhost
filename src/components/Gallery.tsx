@@ -20,7 +20,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
     const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
     const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
-    const breakpointColumnsObj = {default: 4, 1100: 3, 700: 2, 500: 1};
+    const breakpointColumnsObj = {default: 8, 700: 5, 500: 3};
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
