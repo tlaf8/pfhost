@@ -103,7 +103,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                     }
                 });
 
-                setSuccess("File uploaded successfully");
+                setSuccess(`${selectedFile.name} uploaded successfully`);
                 handleClear();
                 setUploadProgress('0');
             } catch (err) {
@@ -125,7 +125,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         } else if (linkInput) {
             try {
                 setFetchingLink(true);
-                await axios.get('https://pfhost.duckdns.org/api/fetchurl', {
+                const response = await axios.get('https://pfhost.duckdns.org/api/fetchurl', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         Accept: 'application/json',
@@ -136,7 +136,13 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                 });
                 handleClear();
                 setFetchingLink(false);
-                setSuccess('Media downloaded successfully.')
+
+                const {results, code} = response.data;
+                if (code === 0) {
+                    setSuccess('All media files downloaded successfully');
+                } else {
+                    setError(`Some files failed to download: ${results}`)
+                }
             } catch (error) {
                 if (axios.isAxiosError(error)) {
                     if (error.status === 501) {
@@ -293,7 +299,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             </div>
 
             {error && (<p style={{color: 'red'}}>{error}</p>)}
-            {success && (<p style={{color: 'green'}}>File uploaded successfully</p>)}
+            {success && (<p style={{color: 'green'}}>{success}</p>)}
 
             {fetchingLink && (
                 <div className='spinner-container' style={{

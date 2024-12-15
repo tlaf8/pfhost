@@ -20,7 +20,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
     const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
     const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
-    const breakpointColumnsObj = {default: 8, 700: 5, 500: 3};
+    const breakpointColumnsObj = {default: 8, 500: 5, 300: 3};
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
@@ -122,7 +122,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     }, [blobUrls]);
 
     return (
-        <div style={{marginTop: '70px'}}>
+        <div style={{marginTop: '65px'}}>
             {isLoading && (
                 <div className='spinner-container' style={{
                     display: 'flex',
