@@ -1,11 +1,17 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Masonry from 'react-masonry-css';
 import axios from 'axios';
-import {Link} from "react-router-dom";
-import {useMedia} from "./MediaContext.tsx";
+import { Link } from 'react-router-dom';
+import { useMedia } from './MediaContext.tsx';
 
 interface GalleryProps {
     userDir: string | null;
+}
+
+interface MediaFile {
+    blobThmb: string;
+    filename: string;
+    url: string;
 }
 
 const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
@@ -14,7 +20,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
     const [uploadLinkShown, setUploadLinkShown] = useState<boolean>(false);
     const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
     const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
-    const breakpointColumnsObj = { default: 8, 500: 5, 300: 3 };
+    const breakpointColumnsObj = { default: 8, 500: 3, 300: 2 };
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
@@ -83,22 +89,37 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             }
 
             for (const file of files) {
-                const fileObject = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        path: userDir,
-                        filename: file,
-                    },
-                });
+                try {
+                    const fileObject = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            path: userDir,
+                            filename: file,
+                        },
+                    });
 
-                setIsLoading(false);
-                setMedia((prevMedia) => [...prevMedia, fileObject.data]);
+                    setIsLoading(false);
+                    setMedia((prevMedia) => [...prevMedia, fileObject.data]);
+                } catch (fileError) {
+                    console.error(`Error fetching thumbnail for file ${file}:`, fileError);
+                }
             }
         } catch (error) {
             console.error('Error fetching media:', error);
             setIsLoading(false);
         }
     }, [userDir, setMedia]);
+
+    const handleScroll = useCallback(() => {
+        const scrollTop = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
+
+        if (scrollTop + windowHeight >= scrollHeight * 0.75) {
+            setMedia((prevMedia) => [...prevMedia, ...prevMedia]);
+        }
+    }, [setMedia]);
+
 
     useEffect(() => {
         if (media.length === 0) {
@@ -108,6 +129,11 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             });
         }
     }, [fetchMediaThumbnails, media.length]);
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
     useEffect(() => {
         return () => {
