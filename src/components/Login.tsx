@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
         }
 
         try {
-            const response = await axios.post(`http://192.168.1.87:9999/api/login`, {
+            const response = await axios.post(`https://pfhost.duckdns.org/api/login`, {
                 username,
                 password,
             });

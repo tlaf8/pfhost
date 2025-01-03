@@ -27,7 +27,7 @@ const AppContent: React.FC = () => {
             const token = sessionStorage.getItem('authToken');
             if (!token) handleLogout();
 
-            const response = await axios.get(`http://192.168.1.87:9999/api/token`, {
+            const response = await axios.get(`https://pfhost.duckdns.org/api/token`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

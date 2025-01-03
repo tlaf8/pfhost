@@ -19,7 +19,7 @@ const SignUpPage: React.FC = () => {
             setError('Passwords do not match.');
         } else {
             try {
-                const response = await axios.post(`http://192.168.1.87:9999/api/register`, {
+                const response = await axios.post(`https://pfhost.duckdns.org/api/register`, {
                     username,
                     email,
                     password

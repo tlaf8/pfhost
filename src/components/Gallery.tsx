@@ -32,7 +32,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             try {
                 const token = sessionStorage.getItem('authToken');
                 if (!token || !userDir) return;
-                const response = await axios.get(`http://192.168.1.87:9999/api/media`, {
+                const response = await axios.get(`https://pfhost.duckdns.org/api/media`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         path: userDir,
@@ -67,7 +67,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             const token = sessionStorage.getItem('authToken');
             if (!token || !userDir) return;
 
-            const response = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
+            const response = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     path: userDir,
@@ -84,7 +84,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
 
             for (const file of files) {
                 try {
-                    const fileObject = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
+                    const fileObject = await axios.get(`https://pfhost.duckdns.org/api/thumbnails`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             path: userDir,
@@ -92,13 +92,13 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
                         },
                     });
 
+                    setIsLoading(false);
                     setMedia((prevMedia) => [...prevMedia, fileObject.data]); // Update media progressively
                 } catch (fileError) {
                     console.error(`Error fetching thumbnail for file ${file}:`, fileError);
                 }
-            }
 
-            setIsLoading(false);
+            }
         } catch (error) {
             console.error('Error fetching media:', error);
             setIsLoading(false);
