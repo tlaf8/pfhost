@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import axios, {isAxiosError} from "axios";
+import {MediaProvider} from "./components/MediaContext.tsx";
 
 const gallery_path: string = '/gallery';
 const upload_path: string = '/upload';
@@ -120,9 +121,11 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <Router>
-            <AppContent/>
-        </Router>
+        <MediaProvider>
+            <Router>
+                <AppContent/>
+            </Router>
+        </MediaProvider>
     );
 };
 

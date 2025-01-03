@@ -2,35 +2,29 @@ import React, {useCallback, useEffect, useState} from 'react';
 import Masonry from 'react-masonry-css';
 import axios from 'axios';
 import {Link} from "react-router-dom";
-
-interface MediaFile {
-    blobThmb: string;
-    filename: string;
-    url: string;
-}
+import {useMedia} from "./MediaContext.tsx";
 
 interface GalleryProps {
     userDir: string | null;
 }
 
-const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
-    const [media, setMedia] = useState<MediaFile[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
+    const { media, setMedia, blobUrls, setBlobUrls } = useMedia();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [uploadLinkShown, setUploadLinkShown] = useState<boolean>(false);
-    const [blobUrls, setBlobUrls] = useState<{ [key: string]: string }>({});
     const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
     const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
-    const breakpointColumnsObj = {default: 8, 500: 5, 300: 3};
+    const breakpointColumnsObj = { default: 8, 500: 5, 300: 3 };
 
     const handleFileClick = async (e: React.MouseEvent, filename: string) => {
         e.preventDefault();
-        setFetchingFile((prev) => ({...prev, [filename]: true}));
-        setDownloadProgress((prev) => ({...prev, [filename]: 0}));
+        setFetchingFile((prev) => ({ ...prev, [filename]: true }));
+        setDownloadProgress((prev) => ({ ...prev, [filename]: 0 }));
         const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
         if (blobUrl) {
             window.open(blobUrl, '_self');
         }
-        setFetchingFile((prev) => ({...prev, [filename]: false}));
+        setFetchingFile((prev) => ({ ...prev, [filename]: false }));
     };
 
     const fetchBlobUrl = useCallback(
@@ -46,8 +40,10 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                     },
                     responseType: 'blob',
                     onDownloadProgress: (progressEvent) => {
-                        const percentage = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
-                        setDownloadProgress((prev) => ({...prev, [filename]: percentage}));
+                        const percentage = progressEvent.total
+                            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                            : 0;
+                        setDownloadProgress((prev) => ({ ...prev, [filename]: percentage }));
                     },
                 });
 
@@ -63,57 +59,55 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                 return null;
             }
         },
-        [userDir]
+        [userDir, setBlobUrls]
     );
 
-    const fetchMediaThumbnails = useCallback(
-        async () => {
-            try {
-                const token = sessionStorage.getItem('authToken');
-                if (!token || !userDir) return;
+    const fetchMediaThumbnails = useCallback(async () => {
+        try {
+            const token = sessionStorage.getItem('authToken');
+            if (!token || !userDir) return;
 
-                const response = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
+            const response = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    path: userDir,
+                    filename: 'gimmefiles',
+                },
+            });
+
+            const { files } = response.data;
+            if (files.length === 0) {
+                setIsLoading(false);
+                setUploadLinkShown(true);
+                return;
+            }
+
+            for (const file of files) {
+                const fileObject = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         path: userDir,
-                        filename: 'gimmefiles',
+                        filename: file,
                     },
                 });
 
-                const {files} = response.data;
-                if (files.length === 0) {
-                    setIsLoading(false);
-                    setUploadLinkShown(true);
-                    return;
-                }
-
-                for (const file of files) {
-                    const fileObject = await axios.get(`http://192.168.1.87:9999/api/thumbnails`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            path: userDir,
-                            filename: file
-                        }
-                    });
-
-                    setIsLoading(false);
-                    setMedia(prevMedia => [...prevMedia, fileObject.data]);
-                }
-            } catch (error) {
-                console.error('Error fetching media:', error);
                 setIsLoading(false);
+                setMedia((prevMedia) => [...prevMedia, fileObject.data]);
             }
-        },
-        [userDir]
-    );
+        } catch (error) {
+            console.error('Error fetching media:', error);
+            setIsLoading(false);
+        }
+    }, [userDir, setMedia]);
 
     useEffect(() => {
         if (media.length === 0) {
+            setIsLoading(true);
             fetchMediaThumbnails().catch((error) => {
                 console.error('Error fetching media:', error);
             });
         }
-    })
+    }, [fetchMediaThumbnails, media.length]);
 
     useEffect(() => {
         return () => {
@@ -122,7 +116,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
     }, [blobUrls]);
 
     return (
-        <div style={{marginTop: '65px'}}>
+        <div style={{ marginTop: '65px' }}>
             {isLoading && (
                 <div className='spinner-container' style={{
                     display: 'flex',
@@ -149,7 +143,7 @@ const MediaGallery: React.FC<GalleryProps> = ({userDir}) => {
                 className='masonry-grid'
                 columnClassName='masonry-grid-column'
             >
-                {media.map((file: MediaFile, index) => (
+                {media.map((file, index) => (
                     <div
                         key={index}
                         className='media-container'
