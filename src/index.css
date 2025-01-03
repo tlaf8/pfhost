@@ -4,6 +4,7 @@
     display: flex;
     margin-left: -5px;
     width: auto;
+    overflow: hidden;
 }
 
 .masonry-grid-col {

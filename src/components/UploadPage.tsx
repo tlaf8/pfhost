@@ -90,7 +90,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
             formData.append("file", selectedFile);
 
             try {
-                await axios.post(`https://pfhost.duckdns.org/api/upload`, formData, {
+                await axios.post(`http://192.168.1.87:9999/api/upload`, formData, {
                     signal: controller.signal,
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
         } else if (linkInput) {
             try {
                 setFetchingLink(true);
-                const response = await axios.get('https://pfhost.duckdns.org/api/fetchurl', {
+                const response = await axios.get('http://192.168.1.87:9999/api/fetchurl', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         Accept: 'application/json',
