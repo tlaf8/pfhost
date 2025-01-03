@@ -8,12 +8,6 @@ interface GalleryProps {
     userDir: string | null;
 }
 
-interface MediaFile {
-    blobThmb: string;
-    filename: string;
-    url: string;
-}
-
 const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
     const { media, setMedia, blobUrls, setBlobUrls } = useMedia();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -98,17 +92,19 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
                         },
                     });
 
-                    setIsLoading(false);
-                    setMedia((prevMedia) => [...prevMedia, fileObject.data]);
+                    setMedia((prevMedia) => [...prevMedia, fileObject.data]); // Update media progressively
                 } catch (fileError) {
                     console.error(`Error fetching thumbnail for file ${file}:`, fileError);
                 }
             }
+
+            setIsLoading(false);
         } catch (error) {
             console.error('Error fetching media:', error);
             setIsLoading(false);
         }
     }, [userDir, setMedia]);
+
 
     const handleScroll = useCallback(() => {
         const scrollTop = window.scrollY;
