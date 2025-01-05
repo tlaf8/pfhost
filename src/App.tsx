@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Link, Route, Routes, useNavigate, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Link, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import React, {useCallback, useEffect, useState} from 'react';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import axios, {isAxiosError} from "axios";
-import {MediaProvider} from "./components/MediaContext.tsx";
+import { MediaProvider } from './components/MediaProvider';
 
 const gallery_path: string = '/gallery';
 const upload_path: string = '/upload';
@@ -21,9 +21,18 @@ const AppContent: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const handleLogout = useCallback(() => {
+        sessionStorage.removeItem('authToken');
+        setUserId(null);
+        setUsername(null);
+        setUserDir(null);
+        navigate('/login');
+    }, [navigate]);
+
     const validateSession = useCallback(async () => {
         try {
             if (location.pathname === '/signup' || location.pathname === '/login') return;
+
             const token = sessionStorage.getItem('authToken');
             if (!token) handleLogout();
 
@@ -48,21 +57,13 @@ const AppContent: React.FC = () => {
             }
             handleLogout()
         }
-    }, [location.pathname, navigate]);
+    }, [handleLogout, location.pathname]);
 
     useEffect(() => {
         validateSession().catch((error) => {
             console.error(error);
         })
     }, [navigate, validateSession])
-
-    const handleLogout = () => {
-        sessionStorage.removeItem('authToken');
-        setUserId(null);
-        setUsername(null);
-        setUserDir(null);
-        navigate('/login');
-    };
 
     return (
         <>
@@ -100,11 +101,17 @@ const AppContent: React.FC = () => {
                         <Link to='/login' className='link' style={{color: 'grey'}}>Upload</Link>
                     )}
                 </div>
-                <div style={{display: 'flex', marginRight: '10px'}}>
+                <div style={{display: 'flex', alignItems: 'center', marginRight: '10px'}}>
+                    <div style={{
+                        float: 'right',
+                        marginRight: '20px'
+                    }}>
+                        Count: {/* Dipslay count of images that have been retrieved */}
+                    </div>
                     {userId !== null ? (
                         <Link to='/login' className='link' onClick={handleLogout}>Logout</Link>
                     ) : (
-                        <p style={{ color: 'black', marginRight: '10px'}}></p>
+                        <p style={{color: 'black', marginRight: '10px'}}></p>
                     )}
                 </div>
             </nav>

@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Masonry from 'react-masonry-css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useMedia } from './MediaContext.tsx';
-
+import {useMedia} from '../hooks/useMedia';
 interface GalleryProps {
     userDir: string | null;
 }
@@ -22,7 +21,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
         setDownloadProgress((prev) => ({ ...prev, [filename]: 0 }));
         const blobUrl = blobUrls[filename] || (await fetchBlobUrl(filename));
         if (blobUrl) {
-            window.open(blobUrl, '_self');
+            window.open(blobUrl, '_blank');
         }
         setFetchingFile((prev) => ({ ...prev, [filename]: false }));
     };
@@ -93,7 +92,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
                     });
 
                     setIsLoading(false);
-                    setMedia((prevMedia) => [...prevMedia, fileObject.data]); // Update media progressively
+                    setMedia((prevMedia) => [...prevMedia, fileObject.data]);
                 } catch (fileError) {
                     console.error(`Error fetching thumbnail for file ${file}:`, fileError);
                 }
@@ -103,19 +102,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             console.error('Error fetching media:', error);
             setIsLoading(false);
         }
-    }, [userDir, setMedia]);
-
-
-    const handleScroll = useCallback(() => {
-        const scrollTop = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const scrollHeight = document.documentElement.scrollHeight;
-
-        if (scrollTop + windowHeight >= scrollHeight * 0.75) {
-            setMedia((prevMedia) => [...prevMedia, ...prevMedia]);
-        }
-    }, [setMedia]);
-
+    }, [setMedia, userDir]);
 
     useEffect(() => {
         if (media.length === 0) {
@@ -125,11 +112,6 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             });
         }
     }, [fetchMediaThumbnails, media.length]);
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [handleScroll]);
 
     useEffect(() => {
         return () => {
@@ -170,7 +152,10 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
                         key={index}
                         className='media-container'
                         style={{
+                            margin: '3px',
                             padding: '5px',
+                            border: '1px solid #ddd',
+                            borderRadius: '5px',
                         }}
                     >
                         <img
