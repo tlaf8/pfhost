@@ -82,7 +82,7 @@ const AppContent: React.FC = () => {
                     zIndex: 9999,
                 }}
             >
-                <div style={{display: 'flex'}}>
+                <div style={{display: 'flex', alignContent: 'center'}}>
                     {(userId !== null) ? (
                         <Link to='/dashboard' className='link'>Home</Link>
                     ) : (
@@ -102,12 +102,6 @@ const AppContent: React.FC = () => {
                     )}
                 </div>
                 <div style={{display: 'flex', alignItems: 'center', marginRight: '10px'}}>
-                    <div style={{
-                        float: 'right',
-                        marginRight: '20px'
-                    }}>
-                        Count: {/* Dipslay count of images that have been retrieved */}
-                    </div>
                     {userId !== null ? (
                         <Link to='/login' className='link' onClick={handleLogout}>Logout</Link>
                     ) : (

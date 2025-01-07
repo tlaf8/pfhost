@@ -3,14 +3,16 @@ import Masonry from 'react-masonry-css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import {useMedia} from '../hooks/useMedia';
+
 interface GalleryProps {
     userDir: string | null;
 }
 
 const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
-    const { media, setMedia, blobUrls, setBlobUrls } = useMedia();
+    const { media, setMedia, blobUrls, setBlobUrls, mediaCount } = useMedia();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [uploadLinkShown, setUploadLinkShown] = useState<boolean>(false);
+    const [hover, setHover] = useState<boolean>(false);
     const [fetchingFile, setFetchingFile] = useState<{ [filename: string]: boolean }>({});
     const [downloadProgress, setDownloadProgress] = useState<{ [filename: string]: number }>({});
     const breakpointColumnsObj = { default: 8, 500: 3, 300: 2 };
@@ -102,7 +104,7 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
             console.error('Error fetching media:', error);
             setIsLoading(false);
         }
-    }, [setMedia, userDir]);
+    }, [setMedia, userDir, ]);
 
     useEffect(() => {
         if (media.length === 0) {
@@ -186,8 +188,35 @@ const MediaGallery: React.FC<GalleryProps> = ({ userDir }) => {
                     </div>
                 ))}
             </Masonry>
+            <div style={{
+                position: 'fixed',
+                bottom: 5,
+                right: 5,
+                borderRadius: '5px',
+                border: '1px solid #ddd',
+                background: 'white',
+            }}>
+                <div
+                    onMouseEnter={() => setHover(true)}
+                    onMouseLeave={() => setHover(false)}
+                    onMouseDown={() => setMedia([])}
+                    style={{
+                        width: '125px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                    }}
+                >
+                    {hover ? (
+                        <p style={{color: '#007bff'}}>Refresh</p>
+                    ) : (
+                        <p>{mediaCount} items</p>
+                    )}
+                </div>
+            </div>
         </div>
     );
-};
+}
 
 export default MediaGallery;

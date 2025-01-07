@@ -62,3 +62,23 @@ div {
         transform: rotate(-180deg) translateX(26.9px);
     }
 }
+
+.fade-container {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    height: 20px;
+    transition: left 0.3s ease;
+}
+
+.fade-item {
+    position: absolute;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}

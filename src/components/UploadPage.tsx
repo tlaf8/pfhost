@@ -137,13 +137,14 @@ const UploadPage: React.FC<UploadProps> = ({userDir}) => {
                 handleClear();
                 setFetchingLink(false);
 
-                const {results, code} = response.data;
-                if (code === 0) {
+                const {results} = response.data;
+                if (response.status === 200) {
                     setSuccess('All media files downloaded successfully');
                 } else {
                     setError(`Some files failed to download: ${results}`)
                 }
             } catch (error) {
+                setFetchingLink(false);
                 if (axios.isAxiosError(error)) {
                     if (error.status === 501) {
                         setError('This site is currently not implemented yet');
